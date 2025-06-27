@@ -1,5 +1,6 @@
 package com.example.construxflow.entity;
 
+import jakarta.annotation.Generated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,23 +14,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "supplier_materials")
+@Table(name = "raw_materials")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class Supplier_material {
-    
+@NoArgsConstructor
+public class Raw_material {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long supplier_materials_id;
+    private Long raw_material_id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_id", referencedColumnName = "material_id")
     private Materials material;
 
-    private String test_report;
+    private Long current_quantity;
+    private Long reorder_level;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supplier_id", referencedColumnName = "supplier_id")
-    private Supplier supplier;
+    @JoinColumn(name = "project_id", referencedColumnName = "project_id")
+    private Project project;
+
+    
 }
