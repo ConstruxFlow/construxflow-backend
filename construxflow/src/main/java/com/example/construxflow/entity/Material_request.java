@@ -33,11 +33,11 @@ public class Material_request {
     @OneToMany(mappedBy = "material_request", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
     private List<Requested_material> requested_materials;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
     private Project project;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "manager_id", referencedColumnName = "manager_id")
     private manager manager;
 
