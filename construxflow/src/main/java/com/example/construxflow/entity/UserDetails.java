@@ -42,12 +42,10 @@ public class UserDetails {
     @Enumerated(EnumType.STRING)
     private User_Role user_role;
 
-    @OneToOne
-    @JoinColumn(name = "manager_id",referencedColumnName = "manager_id")
+    @OneToOne(mappedBy = "userDetails", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
     private manager manager;
 
-    @OneToOne
-    @JoinColumn(name = "supplier_id", referencedColumnName = "supplier_id")
+    @OneToOne(mappedBy = "userDetails", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
     private Supplier supplier;
 
 }
