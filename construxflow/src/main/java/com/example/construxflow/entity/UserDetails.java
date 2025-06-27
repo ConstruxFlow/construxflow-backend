@@ -42,10 +42,10 @@ public class UserDetails {
     @Enumerated(EnumType.STRING)
     private User_Role user_role;
 
-    @OneToOne(mappedBy = "userDetails", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
+    @OneToOne(mappedBy = "userDetails", cascade = jakarta.persistence.CascadeType.ALL)
     private manager manager;
 
-    @OneToOne(mappedBy = "userDetails", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
+    @OneToOne(mappedBy = "userDetails", cascade = jakarta.persistence.CascadeType.ALL)
     private Supplier supplier;
 
 }

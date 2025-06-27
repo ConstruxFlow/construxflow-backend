@@ -15,23 +15,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "requested_materials")
+@Table(name = "quotation_req_materials")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Requested_material {
+public class Quotation_req_materials {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long requested_material_id;
+    private Long quotationReqId;
 
-    private BigDecimal quantity;
-
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "material_id", referencedColumnName = "material_id")
     private Materials material;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_id", referencedColumnName = "request_id")
-    private Material_request material_request;
+    private BigDecimal quantity;
+    private BigDecimal estimatedCost;
+
+    @ManyToOne
+    @JoinColumn(name = "quotation_id", referencedColumnName = "id")
+    private Quotation_request quotationRequest;
+
 }
