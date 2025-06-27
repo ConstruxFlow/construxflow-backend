@@ -1,9 +1,12 @@
 package com.example.construxflow.entity;
 
+import java.util.List;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -24,4 +27,7 @@ public class manager {
 
     @OneToOne(mappedBy = "manager",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private UserDetails userDetails;
+
+    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Material_request> materialRequests;
 }

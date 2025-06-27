@@ -13,23 +13,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "supplier_materials")
+@Table(name = "requested_materials")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Supplier_material {
-    
+public class Requested_material {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long supplier_materials_id;
+    private Long requested_material_id;
+
+    private Long quantity;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_id", referencedColumnName = "material_id")
     private Materials material;
 
-    private String test_report;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supplier_id", referencedColumnName = "supplier_id")
-    private Supplier supplier;
+    @JoinColumn(name = "request_id", referencedColumnName = "request_id")
+    private Material_request material_request;
 }
