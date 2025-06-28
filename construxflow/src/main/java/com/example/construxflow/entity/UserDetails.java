@@ -2,17 +2,8 @@ package com.example.construxflow.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.annotation.Generated;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import com.google.firebase.database.annotations.NotNull;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,22 +21,28 @@ public class UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long User_id;
 
+    @Column(nullable = false, unique = true)
+    private String firebaseUid;
+
     private String user_name;
     private String email;
-    private Number phone_number1;
-    private Number phone_number2;
+    private Long phone_number1;
+    private Long phone_number2;
     private String address;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    @JsonProperty("userRole")
     @Enumerated(EnumType.STRING)
-    private User_Role user_role;
+    private User_Role userRole;
 
-    @OneToOne(mappedBy = "userDetails", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
-    private manager manager;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_id", referencedColumnName = "manager_id")
+    private Manager manager;
 
-    @OneToOne(mappedBy = "userDetails", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "supplier_id", referencedColumnName = "supplier_id")
     private Supplier supplier;
 
 }
