@@ -1,7 +1,5 @@
 package com.example.construxflow.entity;
 
-import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -11,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class manager {
+public abstract class Manager {
     
     @Id
     private String manager_id;
@@ -36,5 +33,6 @@ public abstract class manager {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private UserDetails userDetails;
 
-    
+
+
 }
