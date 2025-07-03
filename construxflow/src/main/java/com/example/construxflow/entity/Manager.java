@@ -29,7 +29,7 @@ public abstract class Manager {
 
     private String manager_name;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private UserDetails userDetails;
 
