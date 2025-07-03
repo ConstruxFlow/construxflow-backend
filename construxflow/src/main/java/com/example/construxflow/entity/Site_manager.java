@@ -1,4 +1,3 @@
-
 package com.example.construxflow.entity;
 
 import java.util.List;
@@ -6,19 +5,19 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
-@DiscriminatorValue("Purchasing_Manager")
+@DiscriminatorValue("Site_Manager")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class purchasing_manager extends manager {
+public class Site_manager extends Manager {
 
-    @OneToMany(mappedBy = "manager")
-    private List<Quotation_request> quotationRequests;
-
+    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Material_request> materialRequests;
 }
