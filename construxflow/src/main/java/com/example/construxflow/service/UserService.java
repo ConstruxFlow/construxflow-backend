@@ -8,6 +8,7 @@ import com.example.construxflow.repository.SupplierRepository;
 import com.example.construxflow.repository.UserRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -146,4 +148,19 @@ public class UserService {
                 throw new IllegalArgumentException("Unsupported manager role: " + role);
         }
     }
+
+    public Optional<UserResponseDetailsDTO> getUserByFirebaseUid(String firebaseUid) {
+        return userRepository.findByFirebaseUid(firebaseUid);
+    }
+
+    public Optional<UserResponseDetailsDTO> getUserByToken(String token) throws FirebaseAuthException {
+        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+        if (decodedToken == null) {
+            return Optional.empty();
+        }
+        String firebaseUid = decodedToken.getUid();
+        return userRepository.findByFirebaseUid(firebaseUid);
+    }
+
+
 }
