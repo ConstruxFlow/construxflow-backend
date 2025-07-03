@@ -33,8 +33,10 @@ public class UserService {
                 .setEmail(dto.getEmail())
                 .setPassword(dto.getPassword())
                 .setDisplayName(dto.getUser_name());
+        
 
         UserRecord userRecord = FirebaseAuth.getInstance().createUser(request);
+
         String firebaseUid = userRecord.getUid();
 
         // Get user role from DTO
@@ -55,6 +57,8 @@ public class UserService {
         user.setPhone_number1(dto.getPhone_number1());
         user.setPhone_number2(dto.getPhone_number2());
         user.setAddress(dto.getAddress());
+        user.setCreatedAt(java.time.LocalDateTime.now());
+
 
         // Handle Manager relationship
         if (dto.getManagerId() != null && !dto.getManagerId().isEmpty()) {
@@ -79,8 +83,9 @@ public class UserService {
                 supplier = new Supplier();
                 supplier.setSupplier_id(dto.getSupplierId());
                 supplier.setName(dto.getUser_name());
+                supplier.setCreatedAt(java.time.LocalDateTime.now());
                 supplier = supplierRepository.save(supplier);
-            }
+            } 
 
             // Establish bidirectional relationship
             user.setSupplier(supplier);
@@ -89,7 +94,7 @@ public class UserService {
 
         // Save user with relationships
         UserDetails savedUser = userRepository.save(user);
-
+        System.out.println("User created with ID: " + savedUser.getUser_id());
         // Build response DTO
         return UserResponseDetailsDTO.builder()
                 .userId(savedUser.getUser_id())
@@ -146,4 +151,6 @@ public class UserService {
                 throw new IllegalArgumentException("Unsupported manager role: " + role);
         }
     }
+
+    
 }
