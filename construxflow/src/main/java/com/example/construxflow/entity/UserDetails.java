@@ -1,5 +1,9 @@
 package com.example.construxflow.entity;
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.google.firebase.database.annotations.NotNull;
@@ -31,11 +35,16 @@ public class UserDetails {
     private String address;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     private String password;
 
     @JsonProperty("userRole")
     @Enumerated(EnumType.STRING)
     private User_Role userRole;
+
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id", referencedColumnName = "manager_id")
