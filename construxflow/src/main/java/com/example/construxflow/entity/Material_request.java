@@ -39,6 +39,6 @@ public class Material_request {
     
     @ManyToOne
     @JoinColumn(name = "manager_id", referencedColumnName = "manager_id")
-    private manager manager;
+    private Manager manager;
 
 }

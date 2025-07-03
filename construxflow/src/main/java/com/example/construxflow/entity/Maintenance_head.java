@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class Maintenance_head extends manager {
+public class Maintenance_head extends Manager {
 
 }

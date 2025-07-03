@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class Inventory_manager extends manager {
+public class Inventory_manager extends Manager {
 
 }

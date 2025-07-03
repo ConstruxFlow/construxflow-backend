@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class Finance_officer extends manager {
+public class Finance_officer extends Manager {
     
 }
