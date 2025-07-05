@@ -60,5 +60,4 @@ public class Quotation_request {
     private Manager manager;
 
 
-
 }
