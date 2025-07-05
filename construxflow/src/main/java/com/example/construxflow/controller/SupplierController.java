@@ -1,10 +1,13 @@
 package com.example.construxflow.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.example.construxflow.api_response.ApiResponse;
+import com.example.construxflow.dto.SupplierDetailsDTO;
 import com.example.construxflow.dto.SupplierRegReqDTO;
+import com.example.construxflow.dto.SupplierRegResDTO;
 import com.example.construxflow.entity.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,16 +35,35 @@ public class SupplierController {
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("status", "error");
-            errorResponse.put("message", "Error fetching latest supplier ID: " + e.getMessage());
-            return ResponseEntity.status(500).body(errorResponse);
+            if ("No suppliers found".equals(e.getMessage())) {
+                errorResponse.put("message", "No suppliers found");
+                return ResponseEntity.status(404).body(errorResponse); // 404 Not Found
+            } else {
+                errorResponse.put("message", "Error fetching latest supplier ID: " + e.getMessage());
+                return ResponseEntity.status(500).body(errorResponse); // 500 Internal Server Error
+            }
         }
     }
 
+
     @PostMapping("/Register")
-    public  ResponseEntity<ApiResponse<String>> register(@RequestBody SupplierRegReqDTO supplier) {
+    public  ResponseEntity<ApiResponse<?>> register(@RequestBody SupplierRegReqDTO supplier) {
         try{
-            String message=supplierService.registerSuppler(supplier);
-            ApiResponse<String> response = ApiResponse.success("Supplier ID retrieved successfully", message);
+            SupplierRegResDTO supplierData=supplierService.registerSuppler(supplier);
+            ApiResponse<SupplierRegResDTO> response = ApiResponse.success("Supplier ID retrieved successfully", supplierData);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ApiResponse<String> errorResponse = ApiResponse.error("Error fetching latest supplier ID: " + e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<?>> getAllSuppliers() {
+        try{
+            List<SupplierDetailsDTO> suppliersData =supplierService.getAllSupplierDetails();
+            ApiResponse<List<SupplierDetailsDTO>> response = ApiResponse.success(suppliersData);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             ApiResponse<String> errorResponse = ApiResponse.error("Error fetching latest supplier ID: " + e.getMessage());
