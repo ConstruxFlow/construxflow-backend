@@ -35,6 +35,11 @@ public class Supplier {
     private String bank_name;
     private String bank_account_name;
     private String bank_account_number;
+    private String on_time_delivery_rate;
+    private String quotation_acceptance_rate;
+    private Long past_orders_completed;
+    private Long avg_delay_days;
+    private Long rating_by_site_manager;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
