@@ -36,22 +36,18 @@ public class ProjectService {
     private final String UPLOAD_DIR = "uploads/boq/";
 
     public ProjectResponseDTO createProject(ProjectRequestDTO request) {
-        // Generate unique project ID
         String projectId = "PROJ-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-        // Create project entity
         Project project = new Project();
-        project.setProject_id(projectId);
-        project.setProject_name(request.getProjectName());
+        project.setProjectId(projectId);
+        project.setProjectName(request.getProjectName());
         project.setLocation(request.getLocation());
-        project.setStart_date(request.getStartDate());
-        project.setEnd_date(request.getEndDate());
-        project.setProgress_status(request.getProgressStatus());
+        project.setStartDate(request.getStartDate());
+        project.setEndDate(request.getEndDate());
+        project.setProgressStatus(request.getProgressStatus());
 
-        // Save project first
         project = projectRepository.save(project);
 
-        // Handle BOQ file upload
         if (request.getBoqFile() != null && !request.getBoqFile().isEmpty()) {
             String filePath = uploadBoqFile(request.getBoqFile(), projectId);
 
@@ -65,7 +61,6 @@ public class ProjectService {
             project.setProjectDocs(docs);
         }
 
-        // Create phases if provided
         if (request.getPhases() != null && !request.getPhases().isEmpty()) {
             List<Project_phase> phases = new ArrayList<>();
 
@@ -77,10 +72,8 @@ public class ProjectService {
                 phase.setStatus(phaseDTO.getStatus());
                 phase.setProject(project);
 
-                // Save phase first
                 phase = projectPhaseRepository.save(phase);
 
-                // Handle materials for this phase
                 if (phaseDTO.getMaterials() != null && !phaseDTO.getMaterials().isEmpty()) {
                     List<Phase_material> phaseMaterials = new ArrayList<>();
 
@@ -104,7 +97,6 @@ public class ProjectService {
             project.setProjectPhases(phases);
         }
 
-        // Save project with all relationships
         project = projectRepository.save(project);
 
         return convertToResponseDTO(project);
@@ -114,18 +106,16 @@ public class ProjectService {
         Materials material;
 
         if (materialDTO.getMaterialId() != null) {
-            // Use existing material
             material = materialsRepository.findById(materialDTO.getMaterialId())
                     .orElseThrow(() -> new RuntimeException("Material not found"));
         } else {
-            // Create new material or find existing one
             material = materialsRepository.findByMaterialNameAndMaterialType(
                             materialDTO.getMaterialName(), materialDTO.getMaterialType())
                     .orElseGet(() -> {
                         Materials newMaterial = new Materials();
-                        newMaterial.setMaterial_name(materialDTO.getMaterialName());
-                        newMaterial.setMaterial_type(materialDTO.getMaterialType());
-                        newMaterial.setUnit_of_measurement(materialDTO.getUnitOfMeasurement());
+                        newMaterial.setMaterialName(materialDTO.getMaterialName());
+                        newMaterial.setMaterialType(materialDTO.getMaterialType());
+                        newMaterial.setUnitOfMeasurement(materialDTO.getUnitOfMeasurement());
                         return materialsRepository.save(newMaterial);
                     });
         }
@@ -135,17 +125,14 @@ public class ProjectService {
 
     private String uploadBoqFile(MultipartFile file, String projectId) {
         try {
-            // Create directory if it doesn't exist
             Path uploadPath = Paths.get(UPLOAD_DIR);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            // Generate unique filename
             String fileName = projectId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             Path filePath = uploadPath.resolve(fileName);
 
-            // Save file
             Files.copy(file.getInputStream(), filePath);
 
             return filePath.toString();
@@ -173,12 +160,12 @@ public class ProjectService {
     private MaterialRequestListDTO convertToMaterialRequestListDTO(Phase_material phaseMaterial) {
         MaterialRequestListDTO dto = new MaterialRequestListDTO();
         dto.setMaterialId("#MAT-" + String.format("%03d", phaseMaterial.getPhase_material_id()));
-        dto.setProjectName(phaseMaterial.getProject_phase().getProject().getProject_name());
+        dto.setProjectName(phaseMaterial.getProject_phase().getProject().getProjectName());
         dto.setPhaseName(phaseMaterial.getProject_phase().getPhase_name());
-        dto.setMaterialName(phaseMaterial.getMaterial().getMaterial_name());
+        dto.setMaterialName(phaseMaterial.getMaterial().getMaterialName());
         dto.setQuantity(phaseMaterial.getQuantity());
-        dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnit_of_measurement());
-        dto.setStatus("NOT_REQUESTED"); // Default status
+        dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnitOfMeasurement());
+        dto.setStatus("NOT_REQUESTED");
 
         return dto;
     }
@@ -199,14 +186,13 @@ public class ProjectService {
 
     private ProjectResponseDTO convertToResponseDTO(Project project) {
         ProjectResponseDTO dto = new ProjectResponseDTO();
-        dto.setProjectId(project.getProject_id());
-        dto.setProjectName(project.getProject_name());
+        dto.setProjectId(project.getProjectId());
+        dto.setProjectName(project.getProjectName());
         dto.setLocation(project.getLocation());
-        dto.setStartDate(project.getStart_date());
-        dto.setEndDate(project.getEnd_date());
-        dto.setProgressStatus(project.getProgress_status());
+        dto.setStartDate(project.getStartDate());
+        dto.setEndDate(project.getEndDate());
+        dto.setProgressStatus(project.getProgressStatus());
 
-        // Convert phases
         if (project.getProjectPhases() != null) {
             List<PhaseResponseDTO> phaseDTOs = project.getProjectPhases().stream()
                     .map(this::convertPhaseToResponseDTO)
@@ -214,7 +200,6 @@ public class ProjectService {
             dto.setPhases(phaseDTOs);
         }
 
-        // Convert documents
         if (project.getProjectDocs() != null) {
             List<String> docPaths = project.getProjectDocs().stream()
                     .map(Project_doc::getDoc_path)
@@ -233,7 +218,6 @@ public class ProjectService {
         dto.setEndDate(phase.getEnd_date());
         dto.setStatus(phase.getStatus());
 
-        // Convert materials
         if (phase.getPhaseMaterials() != null) {
             List<PhaseMaterialResponseDTO> materialDTOs = phase.getPhaseMaterials().stream()
                     .map(this::convertPhaseMaterialToResponseDTO)
@@ -248,9 +232,9 @@ public class ProjectService {
         PhaseMaterialResponseDTO dto = new PhaseMaterialResponseDTO();
         dto.setPhaseMaterialId(phaseMaterial.getPhase_material_id());
         dto.setMaterialId(phaseMaterial.getMaterial().getMaterial_id());
-        dto.setMaterialName(phaseMaterial.getMaterial().getMaterial_name());
-        dto.setMaterialType(phaseMaterial.getMaterial().getMaterial_type());
-        dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnit_of_measurement());
+        dto.setMaterialName(phaseMaterial.getMaterial().getMaterialName());
+        dto.setMaterialType(phaseMaterial.getMaterial().getMaterialType());
+        dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnitOfMeasurement());
         dto.setQuantity(phaseMaterial.getQuantity());
 
         return dto;
