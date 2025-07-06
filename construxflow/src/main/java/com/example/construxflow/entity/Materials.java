@@ -1,18 +1,10 @@
 package com.example.construxflow.entity;
 
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Entity
 @Table(name = "materials")
@@ -20,13 +12,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Materials {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long material_id;
 
-    private String material_name;
-    private String material_type;
-    private String unit_of_measurement;
+    @Column(name = "material_name")
+    private String materialName;
+
+    @Column(name = "material_type")
+    private String materialType;
+
+    @Column(name = "unit_of_measurement")
+    private String unitOfMeasurement;
 
     @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Supplier_material> supplier_materials;
@@ -42,7 +40,4 @@ public class Materials {
 
     @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Quotation_req_materials> quotation_req_materials;
-
-
 }
-
