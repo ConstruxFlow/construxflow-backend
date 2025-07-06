@@ -9,6 +9,7 @@ import com.example.construxflow.dto.SupplierDetailsDTO;
 import com.example.construxflow.dto.SupplierRegReqDTO;
 import com.example.construxflow.dto.SupplierRegResDTO;
 import com.example.construxflow.entity.Supplier;
+import com.google.api.gax.rpc.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -66,10 +67,28 @@ public class SupplierController {
             ApiResponse<List<SupplierDetailsDTO>> response = ApiResponse.success(suppliersData);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            ApiResponse<String> errorResponse = ApiResponse.error("Error fetching latest supplier ID: " + e.getMessage());
+            ApiResponse<String> errorResponse = ApiResponse.error("Error fetching all Suppliers " + e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
         }
 
+    }
+
+    @GetMapping("/find/{id}")
+    public ResponseEntity<ApiResponse<?>> getSupplier(@PathVariable("id") String id) {
+        try{
+            Supplier supplierData=supplierService.getSupplierDetails(id);
+            ApiResponse<Supplier> response = ApiResponse.success(supplierData);
+            return ResponseEntity.ok(response);
+        } catch (NotFoundException e) {
+            ApiResponse<String> errorResponse = ApiResponse.error("Supplier not found: " + e.getMessage());
+            return ResponseEntity.status(404).body(errorResponse);
+        } catch (IllegalArgumentException e) {
+            ApiResponse<String> errorResponse = ApiResponse.error("Invalid supplier ID: " + e.getMessage());
+            return ResponseEntity.status(400).body(errorResponse);
+        } catch (Exception e) {
+            ApiResponse<String> errorResponse = ApiResponse.error("Internal server error: " + e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
     }
 
 }
