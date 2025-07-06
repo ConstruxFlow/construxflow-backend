@@ -8,6 +8,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @Transactional
 public class QuotationRequestService {
@@ -54,5 +57,164 @@ public class QuotationRequestService {
         }
         // Convert to DTO and return
         return quotationRequestMapper.toResponseDTO(savedEntity);
+    }
+
+    public List<QuotationRequestResponseDTO> findAllQuotations() {
+        List<Quotation_request> quotations = quotationReqRepository.findAll();
+
+        return quotations.stream()
+                .map(quotation -> {
+                    // Force loading for each quotation
+                    if (quotation.getQuotationReqMaterials() != null) {
+                        quotation.getQuotationReqMaterials().forEach(qrm -> {
+                            if (qrm.getMaterial() != null) {
+                                qrm.getMaterial().getMaterialName();
+                            }
+                        });
+                    }
+                    return quotationRequestMapper.toResponseDTO(quotation);
+                })
+                .toList();
+    }
+
+    public QuotationRequestResponseDTO findQuotationById(Long id) {
+        Optional<Quotation_request> quotationOpt = quotationReqRepository.findById(id);
+
+        if (quotationOpt.isPresent()) {
+            Quotation_request quotation = quotationOpt.get();
+
+            // Force loading of lazy collections within transaction
+            if (quotation.getQuotationReqMaterials() != null) {
+                quotation.getQuotationReqMaterials().forEach(qrm -> {
+                    if (qrm.getMaterial() != null) {
+                        qrm.getMaterial().getMaterialName();
+                        qrm.getMaterial().getMaterialType();
+                        qrm.getMaterial().getUnitOfMeasurement();
+                    }
+                });
+            }
+
+            if (quotation.getQuotationReqDelivery() != null) {
+                quotation.getQuotationReqDelivery().size(); // Trigger loading
+            }
+
+            if (quotation.getQuotationReqDocs() != null) {
+                quotation.getQuotationReqDocs().size(); // Trigger loading
+            }
+
+            return quotationRequestMapper.toResponseDTO(quotation);
+        } else {
+            throw new RuntimeException("Quotation not found with ID: " + id);
+        }
+    }
+
+    public QuotationRequestResponseDTO updateQuotationStatus(Long id, String newStatus) {
+        Optional<Quotation_request> quotationOpt = quotationReqRepository.findById(id);
+
+        if (quotationOpt.isPresent()) {
+            Quotation_request quotation = quotationOpt.get();
+            quotation.setStatus(newStatus);
+
+            Quotation_request updatedQuotation = quotationReqRepository.save(quotation);
+
+            // Force loading of lazy collections
+            forceLoadCollections(updatedQuotation);
+
+            return quotationRequestMapper.toResponseDTO(updatedQuotation);
+        } else {
+            throw new RuntimeException("Quotation not found with ID: " + id);
+        }
+    }
+
+    //Delete quotation
+    public void deleteQuotation(Long id) {
+        if (quotationReqRepository.existsById(id)) {
+            quotationReqRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Quotation not found with ID: " + id);
+        }
+    }
+
+    // Update entire quotation
+    public QuotationRequestResponseDTO updateQuotation(Long id, Quotation_request updatedQuotation) {
+        Optional<Quotation_request> existingQuotationOpt = quotationReqRepository.findById(id);
+
+        if (existingQuotationOpt.isPresent()) {
+            Quotation_request existingQuotation = existingQuotationOpt.get();
+
+            // Update basic fields
+            existingQuotation.setRequesterName(updatedQuotation.getRequesterName());
+            existingQuotation.setRequest_date(updatedQuotation.getRequest_date());
+            existingQuotation.setQuotation_deadline(updatedQuotation.getQuotation_deadline());
+            existingQuotation.setPriority_level(updatedQuotation.getPriority_level());
+            existingQuotation.setStatus(updatedQuotation.getStatus());
+            existingQuotation.setAdditional_info(updatedQuotation.getAdditional_info());
+            existingQuotation.setQuotation_type(updatedQuotation.getQuotation_type());
+            existingQuotation.setEstimated_cost(updatedQuotation.getEstimated_cost());
+            existingQuotation.setManager(updatedQuotation.getManager());
+
+            // Clear existing collections
+            if (existingQuotation.getQuotationReqMaterials() != null) {
+                existingQuotation.getQuotationReqMaterials().clear();
+            }
+            if (existingQuotation.getQuotationReqDelivery() != null) {
+                existingQuotation.getQuotationReqDelivery().clear();
+            }
+            if (existingQuotation.getQuotationReqDocs() != null) {
+                existingQuotation.getQuotationReqDocs().clear();
+            }
+
+            // Add new collections with proper relationships
+            if (updatedQuotation.getQuotationReqMaterials() != null) {
+                updatedQuotation.getQuotationReqMaterials().forEach(material -> {
+                    material.setQuotationRequest(existingQuotation);
+                    existingQuotation.getQuotationReqMaterials().add(material);
+                });
+            }
+
+            if (updatedQuotation.getQuotationReqDelivery() != null) {
+                updatedQuotation.getQuotationReqDelivery().forEach(delivery -> {
+                    delivery.setQuotationRequest(existingQuotation);
+                    existingQuotation.getQuotationReqDelivery().add(delivery);
+                });
+            }
+
+            if (updatedQuotation.getQuotationReqDocs() != null) {
+                updatedQuotation.getQuotationReqDocs().forEach(doc -> {
+                    doc.setQuotationRequest(existingQuotation);
+                    existingQuotation.getQuotationReqDocs().add(doc);
+                });
+            }
+
+            Quotation_request savedQuotation = quotationReqRepository.save(existingQuotation);
+
+            // Force loading of lazy collections
+            forceLoadCollections(savedQuotation);
+
+            return quotationRequestMapper.toResponseDTO(savedQuotation);
+        } else {
+            throw new RuntimeException("Quotation not found with ID: " + id);
+        }
+    }
+
+    // Helper method to force loading of lazy collections
+    private void forceLoadCollections(Quotation_request quotation) {
+        if (quotation.getQuotationReqMaterials() != null) {
+            quotation.getQuotationReqMaterials().forEach(qrm -> {
+                if (qrm.getMaterial() != null) {
+                    qrm.getMaterial().getMaterialName();
+                    qrm.getMaterial().getMaterialType();
+                    qrm.getMaterial().getUnitOfMeasurement();
+                }
+            });
+        }
+
+        if (quotation.getQuotationReqDelivery() != null) {
+            quotation.getQuotationReqDelivery().size();
+        }
+
+        if (quotation.getQuotationReqDocs() != null) {
+            quotation.getQuotationReqDocs().size();
+        }
     }
 }
