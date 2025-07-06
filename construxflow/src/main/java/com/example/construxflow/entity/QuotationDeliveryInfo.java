@@ -22,7 +22,7 @@ public class QuotationDeliveryInfo {
     @JoinColumn(name = "quotation_id", referencedColumnName = "id")
     private Quotation quotation;
 
-    private LocalDate requiredDate;
+    private LocalDate DeliveryDate;
     private String location;
     private BigDecimal shippingCost;
 }
