@@ -1,0 +1,15 @@
+package com.example.construxflow.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class PurchasingOrderDocDTO {
+    private Long purchasingOrderDocId;
+    private String documentName;
+    private String documentType;
+    private String filePath;
+}
