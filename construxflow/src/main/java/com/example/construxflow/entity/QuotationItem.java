@@ -21,7 +21,10 @@ public class QuotationItem {
     @JoinColumn(name = "quotation_id" , referencedColumnName = "id")
     private Quotation quotation;
 
-    private String itemName;
+    @ManyToOne
+    @JoinColumn(name = "material_id" , referencedColumnName = "material_id")
+    private Materials material;
+
     private int quantity;
     private String unit;
     private BigDecimal unitPrice;
