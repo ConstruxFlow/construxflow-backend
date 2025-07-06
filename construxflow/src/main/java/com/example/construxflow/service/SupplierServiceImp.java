@@ -15,6 +15,7 @@ import com.example.construxflow.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,6 +66,12 @@ public class SupplierServiceImp implements SupplierService{
         return suppliers.stream()
                 .map( this::convertToDTO )
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Supplier getSupplierDetails(String supplierId) throws Exception {
+        Optional<Supplier> supplier=supplierRepository.findById(supplierId);
+        return supplier.get();
     }
 
     // Helper method to convert Entity to DTO

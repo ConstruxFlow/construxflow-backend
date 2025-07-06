@@ -16,4 +16,6 @@ public interface SupplierService {
 
     public List<SupplierDetailsDTO> getAllSupplierDetails() throws Exception;
 
+    public Supplier getSupplierDetails(String supplierId) throws Exception;
+
 }
