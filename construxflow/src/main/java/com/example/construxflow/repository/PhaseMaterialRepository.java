@@ -13,7 +13,7 @@ public interface PhaseMaterialRepository extends JpaRepository<Phase_material, L
     @Query("SELECT pm FROM Phase_material pm " +
             "JOIN pm.project_phase pp " +
             "JOIN pp.project p " +
-            "WHERE p.project_id = :projectId")
+            "WHERE p.projectId = :projectId")
     List<Phase_material> findByProjectId(String projectId);
 
     @Query("SELECT pm FROM Phase_material pm " +

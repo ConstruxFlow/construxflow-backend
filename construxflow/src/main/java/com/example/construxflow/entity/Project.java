@@ -1,16 +1,10 @@
 package com.example.construxflow.entity;
 
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Entity
 @Table(name = "projects")
@@ -19,18 +13,27 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Project {
     @Id
-    private String project_id;
+    @Column(name = "project_id") // maps to DB column
+    private String projectId;
 
-    private String project_name;
+    @Column(name = "project_name")
+    private String projectName;
+
     private String location;
-    private String start_date;
-    private String end_date;
-    private String progress_status;
 
-    @OneToMany(mappedBy = "project", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
+    @Column(name = "start_date")
+    private String startDate;
+
+    @Column(name = "end_date")
+    private String endDate;
+
+    @Column(name = "progress_status")
+    private String progressStatus;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Project_doc> projectDocs;
 
-    @OneToMany(mappedBy = "project",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Project_phase> projectPhases;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -38,5 +41,4 @@ public class Project {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Material_request> materialRequests;
-
 }
