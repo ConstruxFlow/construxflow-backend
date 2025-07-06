@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class SupplierDetailsDTO {
     private String supplier_id;
 
-
     private String name;
     private String company_name;
     private String Business_Registration_Number;
