@@ -25,7 +25,7 @@ public class Quotation_req_materials {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long quotationReqId;
+    private Long quotationReqMaterialId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "material_id", referencedColumnName = "material_id")
