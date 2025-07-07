@@ -58,7 +58,7 @@ public class QuotationRequestMapper {
 
     private QuotationReqMaterialDTO toMaterialDTO(Quotation_req_materials entity) {
         QuotationReqMaterialDTO dto = new QuotationReqMaterialDTO();
-        dto.setQuotationReqId(entity.getQuotationReqId());
+        dto.setQuotationReqMaterialId(entity.getQuotationReqMaterialId());
         dto.setQuantity(entity.getQuantity());
 
         if (entity.getMaterial() != null) {
