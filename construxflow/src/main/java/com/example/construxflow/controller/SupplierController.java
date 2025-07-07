@@ -91,4 +91,22 @@ public class SupplierController {
         }
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ApiResponse> updateSupplier(
+            @PathVariable("id") String id,
+            @RequestBody Supplier updatedSupplier) {
+        try {
+            Supplier savedSupplier = supplierService.updateSupplier(id, updatedSupplier);
+            ApiResponse response = ApiResponse.success("Supplier updated successfully", savedSupplier);
+            return ResponseEntity.ok(response);
+        } catch (NotFoundException e) {
+            ApiResponse errorResponse = ApiResponse.error("Supplier not found: " + e.getMessage());
+            return ResponseEntity.status(404).body(errorResponse);
+        } catch (Exception e) {
+            ApiResponse errorResponse = ApiResponse.error("Error updating supplier: " + e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+
 }

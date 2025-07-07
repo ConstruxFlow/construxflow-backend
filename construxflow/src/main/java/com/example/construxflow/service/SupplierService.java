@@ -18,4 +18,7 @@ public interface SupplierService {
 
     public Supplier getSupplierDetails(String supplierId) throws Exception;
 
+    Supplier updateSupplier(String supplierId, Supplier updatedSupplier) throws Exception;
+
+
 }
