@@ -16,6 +16,6 @@ public class ProjectRequestDTO {
     private String startDate;
     private String endDate;
     private String progressStatus;
-    private MultipartFile boqFile; // For BOQ upload
+    private MultipartFile boqFile; // For BOQ upload (optional)
     private List<PhaseRequestDTO> phases;
 }
