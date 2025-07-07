@@ -6,6 +6,7 @@ import com.example.construxflow.dto.SupplierRegResDTO;
 import com.example.construxflow.entity.Supplier;
 import com.example.construxflow.entity.UserDetails;
 import com.example.construxflow.repository.SupplierRepository;
+import com.google.api.gax.rpc.NotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -99,5 +100,41 @@ public class SupplierServiceImp implements SupplierService{
                 .rating_by_site_manager(supplier.getRating_by_site_manager())
                 .build();
     }
+
+    @Override
+    public Supplier updateSupplier(String supplierId, Supplier updatedSupplier) throws Exception {
+        Optional<Supplier> optionalSupplier = supplierRepository.findById(supplierId);
+        if (!optionalSupplier.isPresent()) {
+            throw new Exception("Supplier not found with ID: " + supplierId);
+        }
+        Supplier existingSupplier = optionalSupplier.get();
+
+        // Update fields - example for main fields, add more as needed
+        existingSupplier.setCompany_name(updatedSupplier.getCompany_name());
+        existingSupplier.setBusiness_Registration_Number(updatedSupplier.getBusiness_Registration_Number());
+        existingSupplier.setDelivery_Capabilities(updatedSupplier.getDelivery_Capabilities());
+        existingSupplier.setBank_name(updatedSupplier.getBank_name());
+        existingSupplier.setBank_account_name(updatedSupplier.getBank_account_name());
+        existingSupplier.setBank_account_number(updatedSupplier.getBank_account_number());
+
+        // Update nested userDetails if provided
+        if (updatedSupplier.getUserDetails() != null) {
+            UserDetails existingUserDetails = existingSupplier.getUserDetails();
+            UserDetails updatedUserDetails = updatedSupplier.getUserDetails();
+
+            if (existingUserDetails != null) {
+                existingUserDetails.setUser_name(updatedUserDetails.getUser_name());
+                existingUserDetails.setEmail(updatedUserDetails.getEmail());
+                existingUserDetails.setPhone_number1(updatedUserDetails.getPhone_number1());
+                existingUserDetails.setAddress(updatedUserDetails.getAddress());
+                // Save userDetails if needed depending on cascade settings
+            } else {
+                existingSupplier.setUserDetails(updatedUserDetails);
+            }
+        }
+
+        return supplierRepository.save(existingSupplier);
+    }
+
 
 }
