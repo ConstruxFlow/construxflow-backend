@@ -5,12 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuotationReqMaterialDTO {
-    private Long quotationReqMaterialId;
-    private MaterialDTO material;
-    private BigDecimal quantity;
+public class PurchasingOrderDeliveryDTO {
+    private Long id;
+    private LocalDate requiredDate;
+    private String location;
+    private BigDecimal shippingCost;
 }

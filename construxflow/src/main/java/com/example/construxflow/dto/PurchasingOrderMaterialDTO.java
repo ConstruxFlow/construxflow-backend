@@ -9,8 +9,10 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuotationReqMaterialDTO {
-    private Long quotationReqMaterialId;
+public class PurchasingOrderMaterialDTO {
+    private Long purchasingOrderMaterialId;
     private MaterialDTO material;
     private BigDecimal quantity;
+    private BigDecimal unitPrice;
+    private BigDecimal cost;
 }
