@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -62,6 +63,7 @@ public class UserService {
         user.setPhone_number1(dto.getPhone_number1());
         user.setPhone_number2(dto.getPhone_number2());
         user.setAddress(dto.getAddress());
+        user.setCreatedAt(LocalDateTime.now());
 
         // Handle Manager relationship
         if (dto.getManagerId() != null && !dto.getManagerId().isEmpty()) {
@@ -86,6 +88,7 @@ public class UserService {
                 supplier = new Supplier();
                 supplier.setSupplier_id(dto.getSupplierId());
                 supplier.setName(dto.getUser_name());
+                supplier.setCreatedAt(LocalDateTime.now());
                 supplier = supplierRepository.save(supplier);
             }
 

@@ -32,6 +32,11 @@ public class ApiResponse<T> {
         return new ApiResponse<>("error", message);
     }
 
+    // Additional convenience method for typed error responses
+    public static <T> ApiResponse<T> error(String message, T data) {
+        return new ApiResponse<>("error", message, data);
+    }
+
     // Getters and Setters
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
