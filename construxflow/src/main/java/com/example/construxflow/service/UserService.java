@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -25,6 +26,12 @@ public class UserService {
     private ManagerRepository managerRepository;
     @Autowired
     private SupplierRepository supplierRepository;
+
+    @Autowired
+    private FirebaseService firebaseService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Transactional
     public UserResponseDetailsDTO createUser(UserRequestDetailsDTO dto) throws FirebaseAuthException {
@@ -90,6 +97,15 @@ public class UserService {
         // Save user with relationships
         UserDetails savedUser = userRepository.save(user);
 
+        try {
+            String verificationLink = firebaseService.generateEmailVerificationLink(dto.getEmail());
+            emailService.sendEmail(dto.getEmail(), "Verify your email",
+                    "Welcome! Please verify your email by clicking this link: " + verificationLink);
+        } catch (Exception e) {
+            // Optionally log or handle email sending failure
+            e.printStackTrace();
+        }
+
         // Build response DTO
         return UserResponseDetailsDTO.builder()
                 .userId(savedUser.getUser_id())
@@ -146,4 +162,22 @@ public class UserService {
                 throw new IllegalArgumentException("Unsupported manager role: " + role);
         }
     }
+
+    public Optional<UserResponseDetailsDTO> getUserByFirebaseUid(String firebaseUid) {
+        return userRepository.findByFirebaseUid(firebaseUid)
+                .map(user -> UserResponseDetailsDTO.builder()
+                        .userId(user.getUser_id())
+                        .firebaseUid(user.getFirebaseUid())
+                        .userName(user.getUser_name())
+                        .email(user.getEmail())
+                        .phoneNumber1(user.getPhone_number1())
+                        .phoneNumber2(user.getPhone_number2())
+                        .address(user.getAddress())
+                        .userRole(user.getUserRole())
+                        .managerId(user.getManager() != null ? user.getManager().getManager_id() : null)
+                        .supplierId(user.getSupplier() != null ? user.getSupplier().getSupplier_id() : null)
+                        .build()
+                );
+    }
+
 }
