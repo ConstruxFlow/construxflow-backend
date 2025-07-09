@@ -3,6 +3,7 @@ package com.example.construxflow.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.CreatedDate;
 
 import jakarta.persistence.CascadeType;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Supplier {
     @Id
     private String supplier_id;
@@ -35,6 +37,11 @@ public class Supplier {
     private String bank_name;
     private String bank_account_name;
     private String bank_account_number;
+    private String on_time_delivery_rate;
+    private String quotation_acceptance_rate;
+    private Long past_orders_completed;
+    private Long avg_delay_days;
+    private Long rating_by_site_manager;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
