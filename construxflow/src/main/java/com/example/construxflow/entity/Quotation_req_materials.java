@@ -32,6 +32,7 @@ public class Quotation_req_materials {
     private Materials material;
 
     private BigDecimal quantity;
+    private BigDecimal unitPrice;
     private BigDecimal estimatedCost;
 
     @ManyToOne(fetch = FetchType.LAZY)
