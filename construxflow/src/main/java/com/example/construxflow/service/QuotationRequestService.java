@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +43,7 @@ public class QuotationRequestService {
             });
         }
 
+        quotation_request.setCreatedDate(LocalDateTime.now());
 
         Quotation_request savedEntity  = quotationReqRepository.save(quotation_request);
         // Force loading of lazy collections within transaction
