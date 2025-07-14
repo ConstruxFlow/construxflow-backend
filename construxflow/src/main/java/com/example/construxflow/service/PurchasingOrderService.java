@@ -5,6 +5,9 @@ import com.example.construxflow.dto.PurchasingOrderResponseDTO;
 import com.example.construxflow.repository.PurchasingOrderRepository;
 import com.example.construxflow.mappers.PurchasingOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -20,6 +23,21 @@ public class PurchasingOrderService {
 
     @Autowired
     private PurchasingOrderMapper purchasingOrderMapper;
+
+
+    public PurchasingOrderResponseDTO findLatestPurchasingOrder() {
+        Pageable pageable = PageRequest.of(0, 1); // Get only the first (latest) result
+        List<PurchasingOrder> purchasingOrders = purchasingOrderRepository.findAllOrderByOrderDateDesc();
+        if (!purchasingOrders.isEmpty()) {
+            PurchasingOrder latestOrder = purchasingOrders.get(0);
+            forceLoadCollections(latestOrder);
+            return purchasingOrderMapper.toResponseDTO(latestOrder);
+        } else {
+            throw new RuntimeException("No Purchasing Orders found");
+        }
+    }
+
+
 
     // Create purchasing order
     public PurchasingOrderResponseDTO createPurchasingOrder(PurchasingOrder purchasingOrder) {
@@ -48,6 +66,7 @@ public class PurchasingOrderService {
         if (purchasingOrder.getOrder_payment() != null) {
             purchasingOrder.getOrder_payment().setPurchasingorder(purchasingOrder);
             purchasingOrder.getOrder_payment().setCreated_date(LocalDateTime.now());
+            purchasingOrder.getOrder_payment().setPayment_date(LocalDateTime.now());
         }
 
         // Save entity
