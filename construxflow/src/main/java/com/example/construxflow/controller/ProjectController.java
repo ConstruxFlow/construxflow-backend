@@ -1,12 +1,25 @@
 package com.example.construxflow.controller;
 
-import com.example.construxflow.dto.*;
-import com.example.construxflow.service.ProjectService;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import com.example.construxflow.dto.MaterialRequestListDTO;
+import com.example.construxflow.dto.PhaseRequestDTO;
+import com.example.construxflow.dto.ProjectRequestDTO;
+import com.example.construxflow.dto.ProjectResponseDTO;
+import com.example.construxflow.service.ProjectService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -17,9 +30,22 @@ public class ProjectController {
     private ProjectService projectService;
 
     @PostMapping("/create")
-    public ResponseEntity<ProjectResponseDTO> createProject(@RequestBody ProjectRequestDTO request) {
+    public ResponseEntity<ProjectResponseDTO> createProject(
+        @RequestParam("projectName") String projectName,
+        @RequestParam("location") String location,
+        @RequestParam("startDate") String startDate,
+        @RequestParam("endDate") String endDate,
+        @RequestParam("progressStatus") String progressStatus,
+        @RequestParam(value = "boqFile", required = false) MultipartFile boqFile,
+        @RequestParam("phases") String phasesJson
+    ) {
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            ProjectResponseDTO response = projectService.createProject(request);
+            java.util.List<PhaseRequestDTO> phases = Arrays.asList(mapper.readValue(phasesJson, PhaseRequestDTO[].class));
+            ProjectRequestDTO dto = new ProjectRequestDTO(
+                projectName, location, startDate, endDate, progressStatus, boqFile, phases
+            );
+            ProjectResponseDTO response = projectService.createProject(dto);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

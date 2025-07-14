@@ -1,5 +1,6 @@
 package com.example.construxflow.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -30,6 +31,8 @@ public class Project_phase {
     private String start_date;
     private String end_date;
     private String status;
+
+    private BigDecimal subtotal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
