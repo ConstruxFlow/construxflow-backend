@@ -46,4 +46,6 @@ public class Materials {
     @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Quotation_req_materials> quotation_req_materials;
+
+
 }

@@ -57,4 +57,8 @@ public class Supplier {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private UserDetails userDetails;
+
+    public String getSupplierId() {
+        return  supplier_id;
+    }
 }
