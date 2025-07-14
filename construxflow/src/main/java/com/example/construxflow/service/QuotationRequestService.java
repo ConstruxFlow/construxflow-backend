@@ -3,6 +3,9 @@ package com.example.construxflow.service;
 import com.example.construxflow.dto.QuotationRequestResponseDTO;
 import com.example.construxflow.entity.Quotation_request;
 import com.example.construxflow.mappers.QuotationRequestMapper;
+import com.example.construxflow.repository.QuotationReqDeliveryRepository;
+import com.example.construxflow.repository.QuotationReqDocRepository;
+import com.example.construxflow.repository.QuotationReqMaterialRepository;
 import com.example.construxflow.repository.QuotationReqRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,16 @@ public class QuotationRequestService {
 
     @Autowired
     private QuotationReqRepository quotationReqRepository;
+
+    @Autowired
+    private QuotationReqMaterialRepository quotationReqMaterialRepository;
+
+    @Autowired
+    private QuotationReqDeliveryRepository quotationReqDeliveryRepository;
+
+    @Autowired
+    private QuotationReqDocRepository quotationReqDocRepository;
+
 
     @Autowired
     private QuotationRequestMapper quotationRequestMapper;
@@ -138,6 +151,7 @@ public class QuotationRequestService {
     }
 
     // Update entire quotation
+    @Transactional
     public QuotationRequestResponseDTO updateQuotation(Long id, Quotation_request updatedQuotation) {
         Optional<Quotation_request> existingQuotationOpt = quotationReqRepository.findById(id);
 
@@ -155,16 +169,10 @@ public class QuotationRequestService {
             existingQuotation.setEstimated_cost(updatedQuotation.getEstimated_cost());
             existingQuotation.setManager(updatedQuotation.getManager());
 
-            // Clear existing collections
-            if (existingQuotation.getQuotationReqMaterials() != null) {
-                existingQuotation.getQuotationReqMaterials().clear();
-            }
-            if (existingQuotation.getQuotationReqDelivery() != null) {
-                existingQuotation.getQuotationReqDelivery().clear();
-            }
-            if (existingQuotation.getQuotationReqDocs() != null) {
-                existingQuotation.getQuotationReqDocs().clear();
-            }
+            // Clear existing collections (cascade delete will handle database removal)
+            existingQuotation.getQuotationReqMaterials().clear();
+            existingQuotation.getQuotationReqDelivery().clear();
+            existingQuotation.getQuotationReqDocs().clear();
 
             // Add new collections with proper relationships
             if (updatedQuotation.getQuotationReqMaterials() != null) {
@@ -198,6 +206,7 @@ public class QuotationRequestService {
             throw new RuntimeException("Quotation not found with ID: " + id);
         }
     }
+
 
     // Helper method to force loading of lazy collections
     private void forceLoadCollections(Quotation_request quotation) {

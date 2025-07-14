@@ -13,4 +13,6 @@ public class QuotationReqMaterialDTO {
     private Long quotationReqMaterialId;
     private MaterialDTO material;
     private BigDecimal quantity;
+    private BigDecimal unitPrice;
+    private BigDecimal estimatedCost;
 }
