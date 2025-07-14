@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/schedule-maintenance-materials")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:")
 public class ScheduleMaintenanceAndRequestMaterialsController {
 
     @Autowired

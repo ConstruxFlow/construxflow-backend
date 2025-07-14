@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quotationrequest")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:")
 public class QuotationRequestController {
 
     @Autowired
