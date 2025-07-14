@@ -18,7 +18,7 @@ import com.example.construxflow.service.SupplierService;
 
 @RestController
 @RequestMapping("/api/supplier")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class SupplierController {
 
     @Autowired
