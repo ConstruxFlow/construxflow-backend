@@ -19,6 +19,21 @@ public class PurchasingOrderController {
     @Autowired
     private PurchasingOrderService purchasingOrderService;
 
+    @GetMapping("/latest")
+    public ResponseEntity<ApiResponse<?>> getLatestPurchasingOrder() {
+        try {
+            PurchasingOrderResponseDTO response = purchasingOrderService.findLatestPurchasingOrder();
+            return ResponseEntity.ok(ApiResponse.success("Latest Purchasing Order retrieved successfully", response));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Purchasing Order not found", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to retrieve purchasing order", e.getMessage()));
+        }
+    }
+
+
     // Create purchasing order
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<?>> createPurchasingOrder(
