@@ -1,10 +1,10 @@
 package com.example.construxflow.dto;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -15,4 +15,6 @@ public class PhaseMaterialRequestDTO {
     private String materialType;
     private String unitOfMeasurement;
     private BigDecimal quantity;
+    private BigDecimal rate;
+    private BigDecimal total;
 }
