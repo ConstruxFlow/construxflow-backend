@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/quotations")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:")
 public class QuotationController {
 
     private final QuotationService quotationService;
