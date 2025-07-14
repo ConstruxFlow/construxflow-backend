@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/equipment-scheduling")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:")
 public class EquipmentSchedulingController {
 
     @Autowired

@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/maintenance-requests")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:")
 public class RequestMaintenanceMaterialsController {
 
     @Autowired
