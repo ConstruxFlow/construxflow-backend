@@ -1,10 +1,11 @@
 package com.example.construxflow.dto;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,4 +16,5 @@ public class PhaseRequestDTO {
     private String endDate;
     private String status;
     private List<PhaseMaterialRequestDTO> materials;
+    private BigDecimal subtotal;
 }

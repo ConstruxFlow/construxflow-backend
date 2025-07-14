@@ -1,13 +1,5 @@
 package com.example.construxflow.service;
 
-import com.example.construxflow.dto.*;
-import com.example.construxflow.entity.*;
-import com.example.construxflow.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +8,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.example.construxflow.dto.MaterialRequestListDTO;
+import com.example.construxflow.dto.PhaseMaterialRequestDTO;
+import com.example.construxflow.dto.PhaseMaterialResponseDTO;
+import com.example.construxflow.dto.PhaseRequestDTO;
+import com.example.construxflow.dto.PhaseResponseDTO;
+import com.example.construxflow.dto.ProjectRequestDTO;
+import com.example.construxflow.dto.ProjectResponseDTO;
+import com.example.construxflow.entity.Materials;
+import com.example.construxflow.entity.Phase_material;
+import com.example.construxflow.entity.Project;
+import com.example.construxflow.entity.Project_doc;
+import com.example.construxflow.entity.Project_phase;
+import com.example.construxflow.repository.MaterialsRepository;
+import com.example.construxflow.repository.PhaseMaterialRepository;
+import com.example.construxflow.repository.ProjectPhaseRepository;
+import com.example.construxflow.repository.ProjectRepository;
 
 @Service
 @Transactional
@@ -71,6 +85,7 @@ public class ProjectService {
                 phase.setEnd_date(phaseDTO.getEndDate());
                 phase.setStatus(phaseDTO.getStatus());
                 phase.setProject(project);
+                phase.setSubtotal(phaseDTO.getSubtotal());
 
                 phase = projectPhaseRepository.save(phase);
 
@@ -84,6 +99,11 @@ public class ProjectService {
                         phaseMaterial.setMaterial(material);
                         phaseMaterial.setQuantity(materialDTO.getQuantity());
                         phaseMaterial.setProject_phase(phase);
+                        phaseMaterial.setRate(materialDTO.getRate());
+                        phaseMaterial.setTotal(materialDTO.getTotal());
+                        phaseMaterial.setMaterialType(materialDTO.getMaterialType());
+                        phaseMaterial.setUnitOfMeasurement(materialDTO.getUnitOfMeasurement());
+                        phaseMaterial.setMaterialName(materialDTO.getMaterialName());
 
                         phaseMaterials.add(phaseMaterial);
                     }
@@ -217,6 +237,7 @@ public class ProjectService {
         dto.setStartDate(phase.getStart_date());
         dto.setEndDate(phase.getEnd_date());
         dto.setStatus(phase.getStatus());
+        dto.setSubtotal(phase.getSubtotal());
 
         if (phase.getPhaseMaterials() != null) {
             List<PhaseMaterialResponseDTO> materialDTOs = phase.getPhaseMaterials().stream()
@@ -236,7 +257,8 @@ public class ProjectService {
         dto.setMaterialType(phaseMaterial.getMaterial().getMaterialType());
         dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnitOfMeasurement());
         dto.setQuantity(phaseMaterial.getQuantity());
-
+        dto.setRate(phaseMaterial.getRate());
+        dto.setTotal(phaseMaterial.getTotal());
         return dto;
     }
 }
