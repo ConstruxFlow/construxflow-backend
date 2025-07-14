@@ -122,6 +122,70 @@ public class ProjectService {
         return convertToResponseDTO(project);
     }
 
+    public ProjectResponseDTO updateProject(String projectId, ProjectRequestDTO request) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        project.setProjectName(request.getProjectName());
+        project.setLocation(request.getLocation());
+        project.setStartDate(request.getStartDate());
+        project.setEndDate(request.getEndDate());
+        project.setProgressStatus(request.getProgressStatus());
+
+        // Handle BOQ file update (optional)
+        if (request.getBoqFile() != null && !request.getBoqFile().isEmpty()) {
+            String filePath = uploadBoqFile(request.getBoqFile(), projectId);
+            Project_doc projectDoc = new Project_doc();
+            projectDoc.setDoc_name(request.getBoqFile().getOriginalFilename());
+            projectDoc.setDoc_path(filePath);
+            projectDoc.setProject(project);
+            List<Project_doc> docs = new ArrayList<>();
+            docs.add(projectDoc);
+            project.setProjectDocs(docs);
+        }
+
+        // Handle phases update (for simplicity, remove old and add new)
+        if (request.getPhases() != null) {
+            // Remove old phases
+            if (project.getProjectPhases() != null) {
+                project.getProjectPhases().clear();
+            }
+            List<Project_phase> phases = new ArrayList<>();
+            for (PhaseRequestDTO phaseDTO : request.getPhases()) {
+                Project_phase phase = new Project_phase();
+                phase.setPhase_name(phaseDTO.getPhaseName());
+                phase.setStart_date(phaseDTO.getStartDate());
+                phase.setEnd_date(phaseDTO.getEndDate());
+                phase.setStatus(phaseDTO.getStatus());
+                phase.setProject(project);
+                phase.setSubtotal(phaseDTO.getSubtotal());
+                phase = projectPhaseRepository.save(phase);
+                if (phaseDTO.getMaterials() != null && !phaseDTO.getMaterials().isEmpty()) {
+                    List<Phase_material> phaseMaterials = new ArrayList<>();
+                    for (PhaseMaterialRequestDTO materialDTO : phaseDTO.getMaterials()) {
+                        Materials material = getOrCreateMaterial(materialDTO);
+                        Phase_material phaseMaterial = new Phase_material();
+                        phaseMaterial.setMaterial(material);
+                        phaseMaterial.setQuantity(materialDTO.getQuantity());
+                        phaseMaterial.setProject_phase(phase);
+                        phaseMaterial.setRate(materialDTO.getRate());
+                        phaseMaterial.setTotal(materialDTO.getTotal());
+                        phaseMaterial.setMaterialType(materialDTO.getMaterialType());
+                        phaseMaterial.setUnitOfMeasurement(materialDTO.getUnitOfMeasurement());
+                        phaseMaterial.setMaterialName(materialDTO.getMaterialName());
+                        phaseMaterials.add(phaseMaterial);
+                    }
+                    phase.setPhaseMaterials(phaseMaterials);
+                }
+                phases.add(phase);
+            }
+            project.setProjectPhases(phases);
+        }
+
+        project = projectRepository.save(project);
+        return convertToResponseDTO(project);
+    }
+
     private Materials getOrCreateMaterial(PhaseMaterialRequestDTO materialDTO) {
         Materials material;
 
@@ -202,6 +266,10 @@ public class ProjectService {
         return projects.stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    public void deleteProject(String projectId) {
+        projectRepository.deleteById(projectId);
     }
 
     private ProjectResponseDTO convertToResponseDTO(Project project) {
