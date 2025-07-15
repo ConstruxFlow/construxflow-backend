@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.construxflow.dto.MaterialRequestListDTO;
+import com.example.construxflow.dto.PhaseMaterialResponseDTO;
 import com.example.construxflow.dto.PhaseRequestDTO;
 import com.example.construxflow.dto.ProjectRequestDTO;
 import com.example.construxflow.dto.ProjectResponseDTO;
@@ -98,6 +99,18 @@ public class ProjectController {
         }
     }
 
+    @GetMapping("/debug/projects")
+    public ResponseEntity<List<String>> debugProjects() {
+        try {
+            List<String> projectInfo = projectService.getAllProjects().stream()
+                .map(p -> "ID: " + p.getProjectId() + ", Name: " + p.getProjectName())
+                .collect(java.util.stream.Collectors.toList());
+            return ResponseEntity.ok(projectInfo);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/materials/request-list")
     public ResponseEntity<List<MaterialRequestListDTO>> getMaterialRequestList() {
         try {
@@ -114,6 +127,23 @@ public class ProjectController {
             List<MaterialRequestListDTO> response = projectService.getMaterialRequestListByProject(projectId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/{projectId}/phases/{phaseName}/materials")
+    public ResponseEntity<List<PhaseMaterialResponseDTO>> getPhaseMaterials(
+        @PathVariable String projectId,
+        @PathVariable String phaseName
+    ) {
+        try {
+            System.out.println("Received request for projectId: " + projectId + ", phaseName: " + phaseName);
+            List<PhaseMaterialResponseDTO> response = projectService.getPhaseMaterials(projectId, phaseName);
+            System.out.println("Found " + response.size() + " materials for phase: " + phaseName);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("Error in getPhaseMaterials: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
