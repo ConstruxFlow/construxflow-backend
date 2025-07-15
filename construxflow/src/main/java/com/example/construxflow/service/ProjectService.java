@@ -234,11 +234,61 @@ public class ProjectService {
     }
 
     public List<MaterialRequestListDTO> getMaterialRequestListByProject(String projectId) {
-        List<Phase_material> phaseMaterials = phaseMaterialRepository.findByProjectId(projectId);
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        return phaseMaterials.stream()
-                .map(this::convertToMaterialRequestListDTO)
-                .collect(Collectors.toList());
+        List<MaterialRequestListDTO> result = new ArrayList<>();
+        if (project.getProjectPhases() != null) {
+            for (Project_phase phase : project.getProjectPhases()) {
+                if (phase.getPhaseMaterials() != null) {
+                    for (Phase_material phaseMaterial : phase.getPhaseMaterials()) {
+                        result.add(convertToMaterialRequestListDTO(phaseMaterial));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<PhaseMaterialResponseDTO> getPhaseMaterials(String projectId, String phaseName) {
+        try {
+            System.out.println("Looking for project: " + projectId);
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new RuntimeException("Project not found: " + projectId));
+            System.out.println("Found project: " + project.getProjectName());
+
+            // Decode the phase name from URL encoding
+            String decodedPhaseName = java.net.URLDecoder.decode(phaseName, java.nio.charset.StandardCharsets.UTF_8);
+            System.out.println("Looking for phase: " + decodedPhaseName);
+
+            List<PhaseMaterialResponseDTO> result = new ArrayList<>();
+            if (project.getProjectPhases() != null) {
+                System.out.println("Project has " + project.getProjectPhases().size() + " phases");
+                for (Project_phase phase : project.getProjectPhases()) {
+                    System.out.println("Checking phase: " + phase.getPhase_name());
+                    if (phase.getPhase_name().equalsIgnoreCase(decodedPhaseName) && phase.getPhaseMaterials() != null) {
+                        System.out.println("Found matching phase with " + phase.getPhaseMaterials().size() + " materials");
+                        for (Phase_material phaseMaterial : phase.getPhaseMaterials()) {
+                            try {
+                                PhaseMaterialResponseDTO dto = convertPhaseMaterialToResponseDTO(phaseMaterial);
+                                result.add(dto);
+                                System.out.println("Added material: " + dto.getMaterialName());
+                            } catch (Exception e) {
+                                System.err.println("Error converting phase material: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            System.out.println("Returning " + result.size() + " materials");
+            return result;
+        } catch (Exception e) {
+            System.err.println("Error in getPhaseMaterials: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     private MaterialRequestListDTO convertToMaterialRequestListDTO(Phase_material phaseMaterial) {
@@ -320,10 +370,15 @@ public class ProjectService {
     private PhaseMaterialResponseDTO convertPhaseMaterialToResponseDTO(Phase_material phaseMaterial) {
         PhaseMaterialResponseDTO dto = new PhaseMaterialResponseDTO();
         dto.setPhaseMaterialId(phaseMaterial.getPhase_material_id());
-        dto.setMaterialId(phaseMaterial.getMaterial().getMaterial_id());
-        dto.setMaterialName(phaseMaterial.getMaterial().getMaterialName());
-        dto.setMaterialType(phaseMaterial.getMaterial().getMaterialType());
-        dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnitOfMeasurement());
+        
+        // Only access material fields directly, avoid nested relationships
+        if (phaseMaterial.getMaterial() != null) {
+            dto.setMaterialId(phaseMaterial.getMaterial().getMaterial_id());
+            dto.setMaterialName(phaseMaterial.getMaterial().getMaterialName());
+            dto.setMaterialType(phaseMaterial.getMaterial().getMaterialType());
+            dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnitOfMeasurement());
+        }
+        
         dto.setQuantity(phaseMaterial.getQuantity());
         dto.setRate(phaseMaterial.getRate());
         dto.setTotal(phaseMaterial.getTotal());
