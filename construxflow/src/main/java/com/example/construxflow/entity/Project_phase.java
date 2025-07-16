@@ -1,8 +1,8 @@
 package com.example.construxflow.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,6 +32,8 @@ public class Project_phase {
     private String end_date;
     private String status;
 
+    private BigDecimal subtotal;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
     private Project project;
@@ -39,4 +41,16 @@ public class Project_phase {
     @OneToMany(mappedBy = "project_phase", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Phase_material> phaseMaterials;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Project_phase phase = (Project_phase) o;
+        return phase_id != null && phase_id.equals(phase.phase_id);
+    }
+
+    @Override
+    public int hashCode() {
+        return phase_id != null ? phase_id.hashCode() : 0;
+    }
 }

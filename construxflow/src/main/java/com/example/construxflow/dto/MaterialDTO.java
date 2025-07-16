@@ -1,20 +1,16 @@
 package com.example.construxflow.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
 public class MaterialDTO {
-    private String name;
-    private String category;
-    private String description;
-    private Integer quantityInStock;
-    private String unitOfMeasure;
-    private Integer reorderLevel;
-    private String purchaseDate;
-    private String expirationDate;
-    private String supplierName;
+    private Long materialId;
+    private String materialName;
+    private String materialType;
+    private String unitOfMeasurement;
+
 }
