@@ -113,10 +113,12 @@ public class ProjectController {
 
     @GetMapping("/materials/request-list")
     public ResponseEntity<List<MaterialRequestListDTO>> getMaterialRequestList() {
+        System.out.println("[DEBUG] Received GET /api/projects/materials/request-list");
         try {
             List<MaterialRequestListDTO> response = projectService.getMaterialRequestList();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
