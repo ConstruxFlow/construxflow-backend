@@ -2,7 +2,6 @@ package com.example.construxflow.entity;
 
 import java.math.BigDecimal;
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +31,11 @@ public class Phase_material {
 
     private BigDecimal quantity;
 
+    private BigDecimal rate;
+    private BigDecimal total;
+    private String materialType;
+    private String unitOfMeasurement;
+    private String materialName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "phase_id", referencedColumnName = "phase_id")
