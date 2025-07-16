@@ -45,6 +45,10 @@ public class MaterialRequestServiceImpl implements MaterialRequestService {
             request.setPriority(dto.getPriority());
             request.setRequest_date(Date.valueOf(dto.getRequestDate()));
 
+            // Set new fields for phase and project
+            request.setPhase_name(dto.getPhase());
+            request.setProject_name(dto.getProject());
+
             // Look up Project by name
             Project project = projectRepository.findAll().stream()
                 .filter(p -> p.getProjectName().equalsIgnoreCase(dto.getProject()))
@@ -77,6 +81,7 @@ public class MaterialRequestServiceImpl implements MaterialRequestService {
                     reqMat.setMaterial(material);
                     reqMat.setQuantity(materialItem.getQuantity());
                     reqMat.setMaterial_request(savedRequest);
+                    reqMat.setStatus("Pending"); // Set status to Pending
                     requestedMaterialRepository.save(reqMat);
                     requestedMaterials.add(reqMat);
                     System.out.println("Requested material saved for: " + material.getMaterialName());
@@ -92,7 +97,9 @@ public class MaterialRequestServiceImpl implements MaterialRequestService {
             simpleResponse.setAdditional_info(savedRequest.getAdditional_info());
             simpleResponse.setPriority(savedRequest.getPriority());
             simpleResponse.setRequest_date(savedRequest.getRequest_date());
-            
+            // Set new fields in response
+            simpleResponse.setPhase_name(savedRequest.getPhase_name());
+            simpleResponse.setProject_name(savedRequest.getProject_name());
             return simpleResponse;
             
         } catch (Exception e) {

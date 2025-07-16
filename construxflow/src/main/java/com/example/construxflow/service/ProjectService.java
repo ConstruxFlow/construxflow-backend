@@ -26,10 +26,12 @@ import com.example.construxflow.entity.Phase_material;
 import com.example.construxflow.entity.Project;
 import com.example.construxflow.entity.Project_doc;
 import com.example.construxflow.entity.Project_phase;
+import com.example.construxflow.entity.Requested_material;
 import com.example.construxflow.repository.MaterialsRepository;
 import com.example.construxflow.repository.PhaseMaterialRepository;
 import com.example.construxflow.repository.ProjectPhaseRepository;
 import com.example.construxflow.repository.ProjectRepository;
+import com.example.construxflow.repository.RequestedMaterialRepository;
 
 @Service
 @Transactional
@@ -46,6 +48,9 @@ public class ProjectService {
 
     @Autowired
     private PhaseMaterialRepository phaseMaterialRepository;
+
+    @Autowired
+    private RequestedMaterialRepository requestedMaterialRepository;
 
     private final String UPLOAD_DIR = "uploads/boq/";
 
@@ -299,8 +304,39 @@ public class ProjectService {
         dto.setMaterialName(phaseMaterial.getMaterial().getMaterialName());
         dto.setQuantity(phaseMaterial.getQuantity());
         dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnitOfMeasurement());
-        dto.setStatus("NOT_REQUESTED");
-
+        // Lookup status from Requested_material
+        List<Requested_material> requestedMaterials = requestedMaterialRepository
+            .findByMaterialAndProjectAndPhase(
+                phaseMaterial.getMaterial().getMaterialName(),
+                phaseMaterial.getProject_phase().getProject().getProjectName(),
+                phaseMaterial.getProject_phase().getPhase_name());
+        String status;
+        if (requestedMaterials == null || requestedMaterials.isEmpty()) {
+            status = "Not Requested";
+        } else {
+            status = requestedMaterials.get(0).getStatus();
+        }
+        // Normalize status for frontend
+        if (status != null) {
+            switch (status.toUpperCase()) {
+                case "NOT_REQUESTED":
+                    dto.setStatus("Not Requested");
+                    break;
+                case "PENDING":
+                    dto.setStatus("Pending");
+                    break;
+                case "APPROVED":
+                    dto.setStatus("Approved");
+                    break;
+                case "REJECTED":
+                    dto.setStatus("Rejected");
+                    break;
+                default:
+                    dto.setStatus(status);
+            }
+        } else {
+            dto.setStatus("Not Requested");
+        }
         return dto;
     }
 
