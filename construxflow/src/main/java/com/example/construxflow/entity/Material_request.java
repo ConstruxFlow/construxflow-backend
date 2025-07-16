@@ -32,6 +32,10 @@ public class Material_request {
 
     private Date request_date;
 
+    // New fields for phase and project
+    private String phase_name;
+    private String project_name;
+
     @OneToMany(mappedBy = "material_request", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
     private List<Requested_material> requested_materials;
 
