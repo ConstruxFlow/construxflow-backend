@@ -6,6 +6,8 @@ import com.example.construxflow.repository.EquipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EquipmentService {
 
@@ -31,5 +33,13 @@ public class EquipmentService {
                 .build();
 
         return equipmentRepository.save(equipment);
+    }
+
+    public List<Equipment> getAllEquipment() {
+        return equipmentRepository.findAll();
+    }
+
+    public Equipment getEquipmentById(Long id) {
+        return equipmentRepository.findById(id).orElse(null);
     }
 }
