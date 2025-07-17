@@ -29,4 +29,5 @@ public class QuotationRequestResponseDTO {
     private List<QuotationReqDeliveryDTO> quotationReqDelivery;
     private List<QuotationReqDocDTO> quotationReqDocs;
     private String managerid;
+//    private List<Material Request> material request;
 }

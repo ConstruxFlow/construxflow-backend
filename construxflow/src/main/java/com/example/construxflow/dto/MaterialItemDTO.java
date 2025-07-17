@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class MaterialDTO {
+@AllArgsConstructor
+public class MaterialItemDTO {
     private Long materialId;
     private String materialName;
-    private String materialType;
+    private java.math.BigDecimal quantity;
     private String unitOfMeasurement;
-
-}
+} 

@@ -46,6 +46,8 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
             equipmentDTO.setId(equipmentSchedulingId); // Backend-generated ID
             equipmentDTO.setEquipmentType(dto.getEquipmentType());
             equipmentDTO.setEquipmentName(dto.getEquipmentName());
+            equipmentDTO.setMaintenanceType(dto.getMaintenanceType());
+            equipmentDTO.setPriority(dto.getPriority());
             equipmentDTO.setDate(dto.getScheduleDate());
             equipmentDTO.setTime(dto.getScheduleTime());
             equipmentDTO.setDescription(dto.getScheduleNotes());
@@ -214,6 +216,8 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
             EquipmentSchedulingRequestDTO equipmentDTO = new EquipmentSchedulingRequestDTO();
             equipmentDTO.setEquipmentType(dto.getEquipmentType());
             equipmentDTO.setEquipmentName(dto.getEquipmentName());
+            equipmentDTO.setMaintenanceType(dto.getMaintenanceType());
+            equipmentDTO.setPriority(dto.getPriority());
             equipmentDTO.setDate(dto.getScheduleDate());
             equipmentDTO.setTime(dto.getScheduleTime());
             equipmentDTO.setDescription(dto.getScheduleNotes());
