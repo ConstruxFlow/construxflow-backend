@@ -64,6 +64,11 @@ public class EquipmentAssignTechnicianService {
 
     }
 
+    public Optional<EquipmentAssignTechnicianResponseDTO> getEquipmentSchedulingDetailsByAssignId(String assignId){
+        return equipmentAssignTechnicianRepository.findById(assignId)
+                .map(this::mapToResponseDTO);
+    }
+
     public EquipmentAssignTechnicianResponseDTO updateAssignStatus(String id, String newStatus){
         Equipment_Assign_Technician assignTechnician = equipmentAssignTechnicianRepository.findById(id).
                 orElseThrow(()->new RuntimeException("Equipment assign technician  not found with id: " + id));

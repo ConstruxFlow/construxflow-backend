@@ -20,4 +20,6 @@ public class FirebaseService {
 
         return FirebaseAuth.getInstance().generateEmailVerificationLink(email, actionCodeSettings);
     }
+
+
 }
