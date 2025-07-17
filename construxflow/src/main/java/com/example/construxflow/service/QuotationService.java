@@ -1,14 +1,14 @@
 package com.example.construxflow.service;
 
-import com.example.construxflow.entity.Quotation;
-import com.example.construxflow.entity.QuotationItem;
-import com.example.construxflow.entity.QuotationDeliveryInfo;
-import com.example.construxflow.entity.QuotationAttachment;
+import com.example.construxflow.entity.*;
 import com.example.construxflow.repository.QuotationRepository;
 import com.example.construxflow.dto.QuotationResponseDTO;
 import com.example.construxflow.mappers.QuotationMapper;
 
+import com.example.construxflow.repository.QuotationReqRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +23,9 @@ public class QuotationService {
     private final QuotationMapper quotationMapper;
 
     @Autowired
+    private QuotationReqRepository quotationRequestRepository;
+
+    @Autowired
     public QuotationService(QuotationRepository quotationRepository, QuotationMapper quotationMapper) {
         this.quotationRepository = quotationRepository;
         this.quotationMapper = quotationMapper;
@@ -32,6 +35,12 @@ public class QuotationService {
     @Transactional
     public QuotationResponseDTO createQuotation(QuotationResponseDTO dto) {
         Quotation quotation = quotationMapper.toEntity(dto);
+
+        Quotation_request quotationRequest = quotationRequestRepository
+                .findById(dto.getQuotationRequestId())
+                .orElseThrow(() -> new EntityNotFoundException("Quotation Request not found"));
+        quotation.setQuotationRequest(quotationRequest);
+
         Quotation saved = quotationRepository.save(quotation);
         return quotationMapper.toDto(saved);
     }
