@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RequestedMaterialDTO {
     private Long requestedMaterialId;
+    private Long materialId;
     private String materialName;
     private String materialType;
     private BigDecimal quantity;
