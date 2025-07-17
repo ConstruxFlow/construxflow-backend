@@ -7,6 +7,7 @@ import com.example.construxflow.repository.NextEquipmentScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -42,5 +43,25 @@ public class NextEquipmentScheduleService {
         responseDTO.setTechnicianId(saved.getTechnicianId());
         return responseDTO;
 
+
+
+    }
+
+    public Optional<NextEquipmentScheduleResponseDTO> getNextScheduleDetailsByAssignId(String assignId) {
+        return nextEquipmentScheduleRepository.findByAssignId(assignId)
+                .map(this::mapToResponseDTO);
+    }
+
+    public NextEquipmentScheduleResponseDTO mapToResponseDTO(Next_Equipment_Schedule nextEquipmentSchedule) {
+        return NextEquipmentScheduleResponseDTO.builder()
+                .nextScheduleId(nextEquipmentSchedule.getNextScheduleId())
+                .assignId(nextEquipmentSchedule.getAssignId())
+                .equipmentScheduleId(nextEquipmentSchedule.getEquipmentScheduleId())
+                .nextMaintenanceType(nextEquipmentSchedule.getNextMaintenanceType())
+                .nextDate(nextEquipmentSchedule.getNextDate())
+                .estimateDuration(nextEquipmentSchedule.getEstimateDuration())
+                .priority(nextEquipmentSchedule.getPriority())
+                .technicianId(nextEquipmentSchedule.getTechnicianId())
+                .build();
     }
 }
