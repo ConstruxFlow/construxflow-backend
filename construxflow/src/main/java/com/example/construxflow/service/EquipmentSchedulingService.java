@@ -29,6 +29,8 @@ public class EquipmentSchedulingService {
         equipment.setId(requestDTO.getId());
         equipment.setEquipmentType(requestDTO.getEquipmentType());
         equipment.setEquipmentName(requestDTO.getEquipmentName());
+        equipment.setMaintenanceType(requestDTO.getMaintenanceType());
+        equipment.setPriority(requestDTO.getPriority());
         equipment.setDate(requestDTO.getDate());
         equipment.setTime(requestDTO.getTime());
         equipment.setDescription(requestDTO.getDescription());
@@ -60,6 +62,8 @@ public class EquipmentSchedulingService {
             Equipment_scheduling equipment = existingEquipment.get();
             equipment.setEquipmentType(requestDTO.getEquipmentType());
             equipment.setEquipmentName(requestDTO.getEquipmentName());
+            equipment.setMaintenanceType(requestDTO.getMaintenanceType());
+            equipment.setPriority(requestDTO.getPriority());
             equipment.setDate(requestDTO.getDate());
             equipment.setTime(requestDTO.getTime());
             equipment.setDescription(requestDTO.getDescription());
@@ -194,6 +198,17 @@ public class EquipmentSchedulingService {
         return equipmentSchedulingRepository.findEquipmentWithMaintenanceRequestCount();
     }
 
+    @Transactional
+    public EquipmentSchedulingResponseDTO updateStatus(String id, String newStatus) {
+        Equipment_scheduling equipmentScheduleEntity = equipmentSchedulingRepository.findById(id).
+                orElseThrow(()->new RuntimeException("Equipment scheduling not found with id: " + id));
+
+        equipmentScheduleEntity.setStatus(newStatus);
+        Equipment_scheduling updated = equipmentSchedulingRepository.save(equipmentScheduleEntity);
+
+        return mapToResponseDTO(equipmentScheduleEntity);
+    }
+
     // Helper method to map entity to response DTO
     private EquipmentSchedulingResponseDTO mapToResponseDTO(Equipment_scheduling equipment) {
         List<RequestMaintenanceMaterialsResponseDTO> maintenanceRequests = null;
@@ -209,6 +224,8 @@ public class EquipmentSchedulingService {
                 .id(equipment.getId())
                 .equipmentType(equipment.getEquipmentType())
                 .equipmentName(equipment.getEquipmentName())
+                .maintenanceType(equipment.getMaintenanceType())
+                .priority(equipment.getPriority())
                 .date(equipment.getDate())
                 .time(equipment.getTime())
                 .description(equipment.getDescription())
