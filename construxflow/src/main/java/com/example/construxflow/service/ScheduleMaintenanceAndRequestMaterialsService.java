@@ -52,6 +52,7 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
             equipmentDTO.setTime(dto.getScheduleTime());
             equipmentDTO.setDescription(dto.getScheduleNotes());
             equipmentDTO.setStatus("Pending");
+            equipmentDTO.setNewStatus("");
 
             System.out.println("Creating Equipment Scheduling...");
             EquipmentSchedulingResponseDTO equipmentResponse =

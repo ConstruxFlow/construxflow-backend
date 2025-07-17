@@ -23,6 +23,7 @@ public class EquipmentSchedulingResponseDTO {
     private Time time;
     private String description;
     private String status;
+    private String newStatus;
 
     // List of maintenance requests (optional - include if needed)
     private List<RequestMaintenanceMaterialsResponseDTO> maintenanceRequests;
