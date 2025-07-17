@@ -26,10 +26,12 @@ import com.example.construxflow.entity.Phase_material;
 import com.example.construxflow.entity.Project;
 import com.example.construxflow.entity.Project_doc;
 import com.example.construxflow.entity.Project_phase;
+import com.example.construxflow.entity.Requested_material;
 import com.example.construxflow.repository.MaterialsRepository;
 import com.example.construxflow.repository.PhaseMaterialRepository;
 import com.example.construxflow.repository.ProjectPhaseRepository;
 import com.example.construxflow.repository.ProjectRepository;
+import com.example.construxflow.repository.RequestedMaterialRepository;
 
 @Service
 @Transactional
@@ -46,6 +48,9 @@ public class ProjectService {
 
     @Autowired
     private PhaseMaterialRepository phaseMaterialRepository;
+
+    @Autowired
+    private RequestedMaterialRepository requestedMaterialRepository;
 
     private final String UPLOAD_DIR = "uploads/boq/";
 
@@ -234,11 +239,61 @@ public class ProjectService {
     }
 
     public List<MaterialRequestListDTO> getMaterialRequestListByProject(String projectId) {
-        List<Phase_material> phaseMaterials = phaseMaterialRepository.findByProjectId(projectId);
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        return phaseMaterials.stream()
-                .map(this::convertToMaterialRequestListDTO)
-                .collect(Collectors.toList());
+        List<MaterialRequestListDTO> result = new ArrayList<>();
+        if (project.getProjectPhases() != null) {
+            for (Project_phase phase : project.getProjectPhases()) {
+                if (phase.getPhaseMaterials() != null) {
+                    for (Phase_material phaseMaterial : phase.getPhaseMaterials()) {
+                        result.add(convertToMaterialRequestListDTO(phaseMaterial));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<PhaseMaterialResponseDTO> getPhaseMaterials(String projectId, String phaseName) {
+        try {
+            System.out.println("Looking for project: " + projectId);
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new RuntimeException("Project not found: " + projectId));
+            System.out.println("Found project: " + project.getProjectName());
+
+            // Decode the phase name from URL encoding
+            String decodedPhaseName = java.net.URLDecoder.decode(phaseName, java.nio.charset.StandardCharsets.UTF_8);
+            System.out.println("Looking for phase: " + decodedPhaseName);
+
+            List<PhaseMaterialResponseDTO> result = new ArrayList<>();
+            if (project.getProjectPhases() != null) {
+                System.out.println("Project has " + project.getProjectPhases().size() + " phases");
+                for (Project_phase phase : project.getProjectPhases()) {
+                    System.out.println("Checking phase: " + phase.getPhase_name());
+                    if (phase.getPhase_name().equalsIgnoreCase(decodedPhaseName) && phase.getPhaseMaterials() != null) {
+                        System.out.println("Found matching phase with " + phase.getPhaseMaterials().size() + " materials");
+                        for (Phase_material phaseMaterial : phase.getPhaseMaterials()) {
+                            try {
+                                PhaseMaterialResponseDTO dto = convertPhaseMaterialToResponseDTO(phaseMaterial);
+                                result.add(dto);
+                                System.out.println("Added material: " + dto.getMaterialName());
+                            } catch (Exception e) {
+                                System.err.println("Error converting phase material: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            System.out.println("Returning " + result.size() + " materials");
+            return result;
+        } catch (Exception e) {
+            System.err.println("Error in getPhaseMaterials: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     private MaterialRequestListDTO convertToMaterialRequestListDTO(Phase_material phaseMaterial) {
@@ -249,8 +304,39 @@ public class ProjectService {
         dto.setMaterialName(phaseMaterial.getMaterial().getMaterialName());
         dto.setQuantity(phaseMaterial.getQuantity());
         dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnitOfMeasurement());
-        dto.setStatus("NOT_REQUESTED");
-
+        // Lookup status from Requested_material
+        List<Requested_material> requestedMaterials = requestedMaterialRepository
+            .findByMaterialAndProjectAndPhase(
+                phaseMaterial.getMaterial().getMaterialName(),
+                phaseMaterial.getProject_phase().getProject().getProjectName(),
+                phaseMaterial.getProject_phase().getPhase_name());
+        String status;
+        if (requestedMaterials == null || requestedMaterials.isEmpty()) {
+            status = "Not Requested";
+        } else {
+            status = requestedMaterials.get(0).getStatus();
+        }
+        // Normalize status for frontend
+        if (status != null) {
+            switch (status.toUpperCase()) {
+                case "NOT_REQUESTED":
+                    dto.setStatus("Not Requested");
+                    break;
+                case "PENDING":
+                    dto.setStatus("Pending");
+                    break;
+                case "APPROVED":
+                    dto.setStatus("Approved");
+                    break;
+                case "REJECTED":
+                    dto.setStatus("Rejected");
+                    break;
+                default:
+                    dto.setStatus(status);
+            }
+        } else {
+            dto.setStatus("Not Requested");
+        }
         return dto;
     }
 
@@ -320,10 +406,15 @@ public class ProjectService {
     private PhaseMaterialResponseDTO convertPhaseMaterialToResponseDTO(Phase_material phaseMaterial) {
         PhaseMaterialResponseDTO dto = new PhaseMaterialResponseDTO();
         dto.setPhaseMaterialId(phaseMaterial.getPhase_material_id());
-        dto.setMaterialId(phaseMaterial.getMaterial().getMaterial_id());
-        dto.setMaterialName(phaseMaterial.getMaterial().getMaterialName());
-        dto.setMaterialType(phaseMaterial.getMaterial().getMaterialType());
-        dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnitOfMeasurement());
+        
+        // Only access material fields directly, avoid nested relationships
+        if (phaseMaterial.getMaterial() != null) {
+            dto.setMaterialId(phaseMaterial.getMaterial().getMaterial_id());
+            dto.setMaterialName(phaseMaterial.getMaterial().getMaterialName());
+            dto.setMaterialType(phaseMaterial.getMaterial().getMaterialType());
+            dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnitOfMeasurement());
+        }
+        
         dto.setQuantity(phaseMaterial.getQuantity());
         dto.setRate(phaseMaterial.getRate());
         dto.setTotal(phaseMaterial.getTotal());

@@ -65,6 +65,16 @@ public class EquipmentSchedulingController {
         }
     }
 
+    //update current status
+    @PutMapping("/status")
+    public ResponseEntity<EquipmentSchedulingResponseDTO> updateEquipmentSchedulingStatus(
+            @RequestParam String id,
+            @RequestBody String newStatus
+    ) {
+        EquipmentSchedulingResponseDTO updated = equipmentSchedulingService.updateStatus(id, newStatus);
+        return ResponseEntity.ok(updated);
+    }
+
     // Delete equipment scheduling
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEquipmentScheduling(@PathVariable String id) {
