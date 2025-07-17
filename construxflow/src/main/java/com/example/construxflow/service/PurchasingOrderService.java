@@ -81,7 +81,7 @@ public class PurchasingOrderService {
 
     // Find purchasing order by ID
     public PurchasingOrderResponseDTO findPurchasingOrderById(Long id) {
-        Optional<PurchasingOrder> purchasingOrderOpt = purchasingOrderRepository.findByIdWithAllRelations(id);
+        Optional<PurchasingOrder> purchasingOrderOpt = purchasingOrderRepository.findById(id);
 
         if (purchasingOrderOpt.isPresent()) {
             PurchasingOrder purchasingOrder = purchasingOrderOpt.get();
