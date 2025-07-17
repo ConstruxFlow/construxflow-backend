@@ -3,6 +3,7 @@ package com.example.construxflow.service;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,4 +109,66 @@ public class MaterialRequestServiceImpl implements MaterialRequestService {
             throw e;
         }
     }
+
+    @Override
+    public List<Material_request> getAllMaterialRequests() {
+        try {
+            System.out.println("Fetching all material requests");
+            List<Material_request> requests = materialRequestRepository.findAll();
+            System.out.println("Found " + requests.size() + " material requests");
+            return requests;
+        } catch (Exception e) {
+            System.err.println("Error fetching all material requests: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch material requests", e);
+        }
+    }
+
+    @Override
+    public Optional<Material_request> getMaterialRequestById(Long id) {
+        try {
+            System.out.println("Fetching material request with ID: " + id);
+            Optional<Material_request> request = materialRequestRepository.findById(id);
+            if (request.isPresent()) {
+                System.out.println("Material request found: " + request.get().getRequest_id());
+            } else {
+                System.out.println("Material request not found with ID: " + id);
+            }
+            return request;
+        } catch (Exception e) {
+            System.err.println("Error fetching material request by ID: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch material request", e);
+        }
+    }
+
+    @Override
+    public Material_request updateMaterialRequestStatus(Long id, String status) {
+        try {
+
+            Optional<Material_request> optionalRequest = materialRequestRepository.findById(id);
+
+            if (optionalRequest.isEmpty()) {
+                throw new RuntimeException("Material request not found with ID: " + id);
+            }
+
+            Material_request request = optionalRequest.get();
+            String oldStatus = request.getStatus();
+
+            // Update only the status
+            request.setStatus(status);
+
+            // Save the updated request
+            Material_request updatedRequest = materialRequestRepository.save(request);
+
+            return updatedRequest;
+
+        } catch (Exception e) {
+            System.err.println("Error updating material request status: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+
 } 
