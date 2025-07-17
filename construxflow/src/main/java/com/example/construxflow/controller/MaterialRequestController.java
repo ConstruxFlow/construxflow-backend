@@ -102,6 +102,7 @@ public class MaterialRequestController {
                         reqMatDTO.setStatus(reqMat.getStatus());
 
                         if (reqMat.getMaterial() != null) {
+                            reqMatDTO.setMaterialId(reqMat.getMaterial().getMaterial_id());
                             reqMatDTO.setMaterialName(reqMat.getMaterial().getMaterialName());
                             reqMatDTO.setMaterialType(reqMat.getMaterial().getMaterialType());
                             reqMatDTO.setUnitOfMeasurement(reqMat.getMaterial().getUnitOfMeasurement());
