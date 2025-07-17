@@ -1,13 +1,11 @@
 package com.example.construxflow.mappers;
 
 import com.example.construxflow.dto.*;
-import com.example.construxflow.entity.Quotation;
-import com.example.construxflow.entity.QuotationItem;
-import com.example.construxflow.entity.QuotationDeliveryInfo;
-import com.example.construxflow.entity.QuotationAttachment;
+import com.example.construxflow.entity.*;
 
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import java.util.List;
 import java.util.ArrayList;
@@ -32,6 +30,7 @@ public class QuotationMapper {
         dto.setNotes(quotation.getNotes());
         dto.setTotalAmount(quotation.getTotalAmount());
         dto.setStatus(quotation.getStatus());
+//        dto.setQuotationRequestId(quotation.getQuotationRequest() != null ? quotation.getQuotationRequest().getId() : null);
 
         // Map Quotation Items
         if (quotation.getItems() != null) {
@@ -108,12 +107,14 @@ public class QuotationMapper {
         // Note: Setting quotationRequest and supplier entities should be handled outside or by service layer
         // Here, only IDs are available, so these references need to be fetched and set externally
 
-        quotation.setCreatedAt(dto.getCreatedAt());
+        quotation.setCreatedAt(LocalDateTime.now());
         quotation.setAdvancedPayment(dto.getAdvancedPayment());
         quotation.setPaymentTerms(dto.getPaymentTerms());
         quotation.setNotes(dto.getNotes());
         quotation.setTotalAmount(dto.getTotalAmount());
         quotation.setStatus(dto.getStatus());
+//        quotation.setQuotationRequest();
+//        quotation.set
 
         // Map Quotation Items
         if (dto.getItems() != null) {
@@ -121,7 +122,12 @@ public class QuotationMapper {
                     .map(itemDTO -> {
                         QuotationItem item = new QuotationItem();
                         item.setId(itemDTO.getId());
-                        // Material entity should be set externally by service using materialId
+                        if (itemDTO.getMaterial() != null) {
+                            Materials material = new Materials();
+                            material.setMaterial_id(itemDTO.getMaterial().getMaterialId());
+
+                            item.setMaterial(material);
+                        }
                         item.setQuantity(itemDTO.getQuantity());
                         item.setUnit(itemDTO.getUnit());
                         item.setUnitPrice(itemDTO.getUnitPrice());
