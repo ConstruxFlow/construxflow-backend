@@ -31,6 +31,7 @@ public class Equipment_scheduling {
     private Time time;
     private String description;
     private String status;
+    private String newStatus;
 
     // Bidirectional relationship - one equipment can have many maintenance requests
     @OneToMany(mappedBy = "equipment", cascade = CascadeType.ALL)

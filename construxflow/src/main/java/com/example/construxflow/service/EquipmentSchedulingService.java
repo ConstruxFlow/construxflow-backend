@@ -35,6 +35,7 @@ public class EquipmentSchedulingService {
         equipment.setTime(requestDTO.getTime());
         equipment.setDescription(requestDTO.getDescription());
         equipment.setStatus(requestDTO.getStatus());
+        equipment.setNewStatus(requestDTO.getNewStatus());
 
         Equipment_scheduling savedEquipment = equipmentSchedulingRepository.save(equipment);
         return mapToResponseDTO(savedEquipment);
@@ -203,7 +204,7 @@ public class EquipmentSchedulingService {
         Equipment_scheduling equipmentScheduleEntity = equipmentSchedulingRepository.findById(id).
                 orElseThrow(()->new RuntimeException("Equipment scheduling not found with id: " + id));
 
-        equipmentScheduleEntity.setStatus(newStatus);
+        equipmentScheduleEntity.setNewStatus(newStatus);
         Equipment_scheduling updated = equipmentSchedulingRepository.save(equipmentScheduleEntity);
 
         return mapToResponseDTO(equipmentScheduleEntity);
@@ -230,6 +231,7 @@ public class EquipmentSchedulingService {
                 .time(equipment.getTime())
                 .description(equipment.getDescription())
                 .status(equipment.getStatus())
+                .newStatus(equipment.getNewStatus())
                 .maintenanceRequests(maintenanceRequests)
                 .build();
     }
