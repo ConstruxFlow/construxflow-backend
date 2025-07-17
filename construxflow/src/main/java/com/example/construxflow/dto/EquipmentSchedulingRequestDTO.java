@@ -14,6 +14,8 @@ public class EquipmentSchedulingRequestDTO {
     private String id;
     private String equipmentType;
     private String equipmentName;
+    private String maintenanceType;
+    private String priority;
     private Date date;
     private Time time;
     private String description;
