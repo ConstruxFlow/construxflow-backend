@@ -3,6 +3,7 @@ package com.example.construxflow.controller;
 import com.example.construxflow.dto.QuotationResponseDTO;
 import com.example.construxflow.service.QuotationService;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +81,18 @@ public class QuotationController {
         if (deleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+//    FIND BY USING QUOTATION REQUEST ID
+    @GetMapping("/byquotationreq/{quotationRequestId}")
+    public ResponseEntity<List<QuotationResponseDTO>> getQuotationsByRequestIdValidated(
+            @PathVariable Long quotationRequestId) {
+        try {
+            List<QuotationResponseDTO> quotations = quotationService.getQuotationsByRequestIdWithValidation(quotationRequestId);
+            return new ResponseEntity<>(quotations, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
