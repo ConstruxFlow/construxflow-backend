@@ -20,4 +20,5 @@ public class EquipmentSchedulingRequestDTO {
     private Time time;
     private String description;
     private String status;
+    private String newStatus;
 }
