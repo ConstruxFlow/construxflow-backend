@@ -1,6 +1,9 @@
 package com.example.construxflow.service;
 
 import com.example.construxflow.dto.QuotationRequestResponseDTO;
+import com.example.construxflow.entity.Quotation_req_delivery;
+import com.example.construxflow.entity.Quotation_req_doc;
+import com.example.construxflow.entity.Quotation_req_materials;
 import com.example.construxflow.entity.Quotation_request;
 import com.example.construxflow.mappers.QuotationRequestMapper;
 import com.example.construxflow.repository.QuotationReqDeliveryRepository;
@@ -13,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -169,15 +174,50 @@ public class QuotationRequestService {
             existingQuotation.setEstimated_cost(updatedQuotation.getEstimated_cost());
             existingQuotation.setManager(updatedQuotation.getManager());
 
-            // Clear existing collections (cascade delete will handle database removal)
-            existingQuotation.getQuotationReqMaterials().clear();
-            existingQuotation.getQuotationReqDelivery().clear();
-            existingQuotation.getQuotationReqDocs().clear();
+            // Delete existing materials from database BEFORE clearing
+            if (existingQuotation.getQuotationReqMaterials() != null && !existingQuotation.getQuotationReqMaterials().isEmpty()) {
+                List<Long> materialIds = existingQuotation.getQuotationReqMaterials().stream()
+                        .map(Quotation_req_materials::getQuotationReqMaterialId)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+                if (!materialIds.isEmpty()) {
+                    quotationReqMaterialRepository.deleteAllById(materialIds);
+                }
+                existingQuotation.getQuotationReqMaterials().clear();
+            }
+
+            // Delete existing delivery locations from database BEFORE clearing
+            if (existingQuotation.getQuotationReqDelivery() != null && !existingQuotation.getQuotationReqDelivery().isEmpty()) {
+                List<Long> deliveryIds = existingQuotation.getQuotationReqDelivery().stream()
+                        .map(Quotation_req_delivery::getQuotationReqDeliveryId)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+                if (!deliveryIds.isEmpty()) {
+                    quotationReqDeliveryRepository.deleteAllById(deliveryIds);
+                }
+                existingQuotation.getQuotationReqDelivery().clear();
+            }
+
+            // Delete existing documents from database BEFORE clearing
+            if (existingQuotation.getQuotationReqDocs() != null && !existingQuotation.getQuotationReqDocs().isEmpty()) {
+                List<Long> docIds = existingQuotation.getQuotationReqDocs().stream()
+                        .map(Quotation_req_doc::getQuotationReqId)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+                if (!docIds.isEmpty()) {
+                    quotationReqDocRepository.deleteAllById(docIds);
+                }
+                existingQuotation.getQuotationReqDocs().clear();
+            }
+
+            // Flush to ensure deletions are committed
+            quotationReqRepository.flush();
 
             // Add new collections with proper relationships
             if (updatedQuotation.getQuotationReqMaterials() != null) {
                 updatedQuotation.getQuotationReqMaterials().forEach(material -> {
                     material.setQuotationRequest(existingQuotation);
+                    material.setQuotationReqMaterialId(null); // Ensure new ID generation
                     existingQuotation.getQuotationReqMaterials().add(material);
                 });
             }
@@ -185,6 +225,7 @@ public class QuotationRequestService {
             if (updatedQuotation.getQuotationReqDelivery() != null) {
                 updatedQuotation.getQuotationReqDelivery().forEach(delivery -> {
                     delivery.setQuotationRequest(existingQuotation);
+                    delivery.setQuotationReqDeliveryId(null); // Ensure new ID generation
                     existingQuotation.getQuotationReqDelivery().add(delivery);
                 });
             }
@@ -192,6 +233,7 @@ public class QuotationRequestService {
             if (updatedQuotation.getQuotationReqDocs() != null) {
                 updatedQuotation.getQuotationReqDocs().forEach(doc -> {
                     doc.setQuotationRequest(existingQuotation);
+                    doc.setQuotationReqId(null); // Ensure new ID generation
                     existingQuotation.getQuotationReqDocs().add(doc);
                 });
             }
@@ -206,6 +248,7 @@ public class QuotationRequestService {
             throw new RuntimeException("Quotation not found with ID: " + id);
         }
     }
+
 
 
     // Helper method to force loading of lazy collections
