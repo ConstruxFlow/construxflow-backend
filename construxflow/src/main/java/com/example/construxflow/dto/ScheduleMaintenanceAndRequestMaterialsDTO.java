@@ -23,6 +23,7 @@ public class ScheduleMaintenanceAndRequestMaterialsDTO {
     private Time scheduleTime;
     private String scheduleNotes;
     private String status;
+    private String newStatus;
 
     // Material Request fields
     private List<MaterialItemDTO> materialItems;

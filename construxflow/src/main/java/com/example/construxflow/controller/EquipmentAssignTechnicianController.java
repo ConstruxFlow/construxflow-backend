@@ -3,7 +3,10 @@ package com.example.construxflow.controller;
 import com.example.construxflow.dto.EquipmentAssignTechnicianRequestDTO;
 import com.example.construxflow.dto.EquipmentAssignTechnicianResponseDTO;
 import com.example.construxflow.dto.EquipmentSchedulingResponseDTO;
+import com.example.construxflow.service.AuthService;
 import com.example.construxflow.service.EquipmentAssignTechnicianService;
+import com.google.firebase.auth.FirebaseToken;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +23,13 @@ public class EquipmentAssignTechnicianController {
     @Autowired
     private EquipmentAssignTechnicianService equipmentAssignTechnicianService;
 
+    @Autowired
+    private AuthService authService;
+
     @PostMapping("/addassign")
-    public ResponseEntity<?> addAssign(@RequestBody EquipmentAssignTechnicianRequestDTO requestDTO) {
+    public ResponseEntity<?> addAssign(@RequestBody EquipmentAssignTechnicianRequestDTO requestDTO, HttpServletRequest request) {
         try {
+            FirebaseToken token = authService.checkAuth(request);
             EquipmentAssignTechnicianResponseDTO responseDTO = equipmentAssignTechnicianService.assignTechnician(requestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (Exception e) {
@@ -33,8 +40,9 @@ public class EquipmentAssignTechnicianController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllEquipmentAssignTechnician() {
+    public ResponseEntity<?> getAllEquipmentAssignTechnician(HttpServletRequest request) {
         try {
+            FirebaseToken token = authService.checkAuth(request);
             List<EquipmentAssignTechnicianResponseDTO> equipmentAssignList = equipmentAssignTechnicianService.getEquipmentAssignDetails();
             return ResponseEntity.ok(equipmentAssignList);
         }catch (Exception e) {
@@ -45,6 +53,12 @@ public class EquipmentAssignTechnicianController {
     @GetMapping
     public ResponseEntity<EquipmentAssignTechnicianResponseDTO> getEquipmentAssignDetailsById(@RequestParam String id) {
         Optional<EquipmentAssignTechnicianResponseDTO> equipmentResponseDto = equipmentAssignTechnicianService.getEquipmentSchedulingDetailsById(id);
+        return equipmentResponseDto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/getbyassignId")
+    public ResponseEntity<EquipmentAssignTechnicianResponseDTO> getEquipmentAssignDetailsByAssignId(@RequestParam String id) {
+        Optional<EquipmentAssignTechnicianResponseDTO> equipmentResponseDto = equipmentAssignTechnicianService.getEquipmentSchedulingDetailsByAssignId(id);
         return equipmentResponseDto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
