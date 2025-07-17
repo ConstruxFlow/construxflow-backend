@@ -6,10 +6,13 @@ import com.example.construxflow.entity.UserDetails;
 import com.example.construxflow.service.EmailService;
 import com.example.construxflow.service.FirebaseService;
 import com.example.construxflow.service.UserService;
+import com.google.api.pathtemplate.ValidationException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
+import lombok.extern.flogger.Flogger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +43,14 @@ public class UserController {
         try{
             UserResponseDetailsDTO savedUser = userService.createUser(userDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        }catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
+        } catch (ValidationException e) {
+            return ResponseEntity.badRequest().body("Invalid user data: " + e.getMessage());
+        } catch (Exception e) {
+//            Flogger.error("Registration failed", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Registration failed: " + e.getMessage());
         }
     }
 
