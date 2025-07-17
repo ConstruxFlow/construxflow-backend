@@ -64,6 +64,7 @@ public class QuotationRequestService {
         quotation_request.setCreatedDate(LocalDateTime.now());
 
         Quotation_request savedEntity  = quotationReqRepository.save(quotation_request);
+//        System.out.println(quotation_request);
         // Force loading of lazy collections within transaction
         if (savedEntity.getQuotationReqMaterials() != null) {
             savedEntity.getQuotationReqMaterials().forEach(qrm -> {

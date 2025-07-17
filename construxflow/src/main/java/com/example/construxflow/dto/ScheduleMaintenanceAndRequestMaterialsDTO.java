@@ -17,6 +17,8 @@ public class ScheduleMaintenanceAndRequestMaterialsDTO {
     private String equipmentSchedulingId; // User-provided
     private String equipmentType;
     private String equipmentName;
+    private String maintenanceType;
+    private String priority;
     private Date scheduleDate;
     private Time scheduleTime;
     private String scheduleNotes;
