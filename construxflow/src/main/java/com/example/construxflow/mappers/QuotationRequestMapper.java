@@ -23,6 +23,9 @@ public class QuotationRequestMapper {
         dto.setQuotationType(entity.getQuotation_type());
         dto.setEstimatedCost(entity.getEstimated_cost());
         dto.setCreatedDate(entity.getCreatedDate());
+        dto.setMaterial_req_id(entity.getMaterial_req_id());
+        dto.setProjectId(entity.getProjectId());
+        dto.setManagerid(entity.getManager_id());
 
         // Map nested collections
         if (entity.getQuotationReqMaterials() != null) {
@@ -48,10 +51,6 @@ public class QuotationRequestMapper {
                             .collect(Collectors.toList())
             );
         }
-
-//        if (entity.getManager() != null) {
-//            dto.setManager(toManagerDTO(entity.getManager()));
-//        }
 
         return dto;
     }

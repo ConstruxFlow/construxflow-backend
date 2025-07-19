@@ -21,6 +21,8 @@ public class PurchasingOrderMapper {
         dto.setSubTotal(entity.getSubTotal());
         dto.setItems(entity.getItems());
         dto.setCreatedDate(entity.getCreatedDate());
+        dto.setMaterial_req_id(entity.getMaterial_req_id());
+        dto.setProjectId(entity.getProjectId());
 
         // Map supplier
         if (entity.getSupplier() != null) {

@@ -21,6 +21,8 @@ public class PurchasingOrderResponseDTO {
     private BigDecimal subTotal;
     private BigDecimal items;
     private LocalDateTime createdDate;
+    private Long material_req_id;
+    private String projectId;
 
     // Clean nested DTOs without circular references
     private SupplierDetailsDTO supplier;
