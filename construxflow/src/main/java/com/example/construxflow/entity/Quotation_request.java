@@ -41,6 +41,8 @@ public class Quotation_request {
     private String additional_info;
     private String quotation_type; // e.g., "Material", "Service", "Equipment"
     private BigDecimal estimated_cost;
+    private Long material_req_id;
+    private String projectId;
     
     @CreatedDate
     @Column(name = "created_date", updatable = false)
@@ -55,9 +57,8 @@ public class Quotation_request {
     @OneToMany(mappedBy = "quotationRequest", cascade = CascadeType.ALL)
     private List<Quotation_req_doc> quotationReqDocs;
 
-    @ManyToOne
-    @JoinColumn(name = "manager_id", referencedColumnName = "manager_id")
-    private Manager manager;
+    private String manager_id;
+
 
 
 }
