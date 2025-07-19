@@ -23,6 +23,8 @@ public class QuotationRequestResponseDTO {
     private String quotationType;
     private BigDecimal estimatedCost;
     private LocalDateTime createdDate;
+    private Long material_req_id;
+    private String projectId;
 
     // Clean nested DTOs without circular references
     private List<QuotationReqMaterialDTO> quotationReqMaterials;
