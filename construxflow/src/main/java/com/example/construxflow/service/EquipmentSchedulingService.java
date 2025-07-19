@@ -205,6 +205,7 @@ public class EquipmentSchedulingService {
                 orElseThrow(()->new RuntimeException("Equipment scheduling not found with id: " + id));
 
         equipmentScheduleEntity.setNewStatus(newStatus);
+        equipmentScheduleEntity.setStatus(newStatus);
         Equipment_scheduling updated = equipmentSchedulingRepository.save(equipmentScheduleEntity);
 
         return mapToResponseDTO(equipmentScheduleEntity);
