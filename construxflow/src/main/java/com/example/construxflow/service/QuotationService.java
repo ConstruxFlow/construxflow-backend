@@ -95,5 +95,17 @@ public class QuotationService {
         }
         return null;
     }
+
+    public List<QuotationResponseDTO> getQuotationsByRequestIdWithValidation(Long quotationRequestId) {
+        // Validate if quotation request exists
+        if (!quotationRequestRepository.existsById(quotationRequestId)) {
+            throw new EntityNotFoundException("Quotation Request with ID " + quotationRequestId + " not found");
+        }
+
+        List<Quotation> quotations = quotationRepository.findByQuotationRequestIdCustom(quotationRequestId);
+        return quotations.stream()
+                .map(quotationMapper::toDto)
+                .toList();
+    }
 }
 
