@@ -1,5 +1,5 @@
 package com.example.construxflow.controller;
-
+import com.example.construxflow.dto.MaintenanceRequestOverviewDTO;
 import com.example.construxflow.dto.ScheduleMaintenanceAndRequestMaterialsDTO;
 import com.example.construxflow.dto.ScheduleMaintenanceAndRequestMaterialsResponseDTO;
 import com.example.construxflow.service.ScheduleMaintenanceAndRequestMaterialsService;
@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.construxflow.dto.MaintenanceRequestDetailDTO;
 
 import java.util.List;
 
@@ -143,4 +144,26 @@ public class ScheduleMaintenanceAndRequestMaterialsController {
                         .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
+
+    @GetMapping("/overview")
+    public ResponseEntity<List<MaintenanceRequestOverviewDTO>> getAllMaintenanceRequestsOverview() {
+        try {
+            List<MaintenanceRequestOverviewDTO> data = scheduleMaintenanceAndRequestMaterialsService.getAllMaintenanceRequestsOverview();
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/details/{equipmentId}")
+    public ResponseEntity<?> getMaintenanceRequestDetails(@PathVariable String equipmentId) {
+        try {
+            MaintenanceRequestDetailDTO dto =
+                    scheduleMaintenanceAndRequestMaterialsService.getMaintenanceRequestDetails(equipmentId);
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to load maintenance request details: " + e.getMessage());
+        }
+    }
+
 }
