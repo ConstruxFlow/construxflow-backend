@@ -23,6 +23,9 @@ public class Project {
     @Column(name = "project_id") // maps to DB column
     private String projectId;
 
+//    @Column(name = "manager_id")
+    private String managerId;
+
     @Column(name = "project_name")
     private String projectName;
 
