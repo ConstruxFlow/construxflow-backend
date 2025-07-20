@@ -1,6 +1,5 @@
 package com.example.construxflow.repository;
 
-import com.example.construxflow.dto.UserResponseDetailsDTO;
 import com.example.construxflow.entity.UserDetails;
 import com.example.construxflow.entity.User_Role;
 import org.springframework.data.jpa.repository.JpaRepository;

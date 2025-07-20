@@ -2,8 +2,6 @@ package com.example.construxflow.entity;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,19 +23,17 @@ public class Quotation_req_materials {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long quotationReqMaterialId;
+    private Long quotationReqId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "material_id", referencedColumnName = "material_id")
     private Materials material;
 
     private BigDecimal quantity;
-    private BigDecimal unitPrice;
     private BigDecimal estimatedCost;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "quotation_id", referencedColumnName = "id")
-    @JsonIgnore
     private Quotation_request quotationRequest;
 
 }

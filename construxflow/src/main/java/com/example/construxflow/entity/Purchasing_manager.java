@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Purchasing_manager extends Manager {
 
-
+    @OneToMany(mappedBy = "manager")
+    private List<Quotation_request> quotationRequests;
 
 }

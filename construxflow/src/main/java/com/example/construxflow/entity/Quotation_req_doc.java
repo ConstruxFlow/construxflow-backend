@@ -1,6 +1,5 @@
 package com.example.construxflow.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.mapping.Join;
 
 import jakarta.annotation.Generated;
@@ -31,7 +30,6 @@ public class Quotation_req_doc {
 
     @ManyToOne
     @JoinColumn(name = "quotation_id", referencedColumnName = "id")
-    @JsonIgnore
     private Quotation_request quotationRequest;
 
 }

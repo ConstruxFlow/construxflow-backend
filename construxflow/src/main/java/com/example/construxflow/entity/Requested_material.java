@@ -26,8 +26,6 @@ public class Requested_material {
 
     private BigDecimal quantity;
 
-    private String status; // e.g., 'Not Requested', 'Pending', 'Approved', 'Rejected'
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_id", referencedColumnName = "material_id")

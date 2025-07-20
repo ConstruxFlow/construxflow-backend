@@ -4,8 +4,7 @@ import java.sql.Date;
 import java.util.List;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -23,7 +22,6 @@ import lombok.NoArgsConstructor;
 public class Material_request {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long request_id;
 
     private String status;
@@ -31,10 +29,6 @@ public class Material_request {
     private String priority;
 
     private Date request_date;
-
-    // New fields for phase and project
-    private String phase_name;
-    private String project_name;
 
     @OneToMany(mappedBy = "material_request", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
     private List<Requested_material> requested_materials;

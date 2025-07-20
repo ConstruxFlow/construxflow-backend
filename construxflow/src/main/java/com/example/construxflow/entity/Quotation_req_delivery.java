@@ -2,7 +2,6 @@ package com.example.construxflow.entity;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,7 +31,6 @@ public class Quotation_req_delivery {
 
     @ManyToOne
     @JoinColumn(name = "quotation_id", referencedColumnName = "id")
-    @JsonIgnore
     private Quotation_request quotationRequest;
 
 }
