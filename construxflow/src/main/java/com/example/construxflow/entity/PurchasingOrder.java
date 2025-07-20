@@ -27,6 +27,8 @@ public class PurchasingOrder {
     private String additional_info;
     private BigDecimal subTotal;
     private BigDecimal items;
+    private Long material_req_id;
+    private String projectId;
 
     @CreatedDate
     @Column(name = "created_date", updatable = false)

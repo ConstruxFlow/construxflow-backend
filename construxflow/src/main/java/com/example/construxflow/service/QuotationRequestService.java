@@ -1,15 +1,10 @@
 package com.example.construxflow.service;
 
 import com.example.construxflow.dto.QuotationRequestResponseDTO;
-import com.example.construxflow.entity.Quotation_req_delivery;
-import com.example.construxflow.entity.Quotation_req_doc;
-import com.example.construxflow.entity.Quotation_req_materials;
-import com.example.construxflow.entity.Quotation_request;
+import com.example.construxflow.entity.*;
 import com.example.construxflow.mappers.QuotationRequestMapper;
-import com.example.construxflow.repository.QuotationReqDeliveryRepository;
-import com.example.construxflow.repository.QuotationReqDocRepository;
-import com.example.construxflow.repository.QuotationReqMaterialRepository;
-import com.example.construxflow.repository.QuotationReqRepository;
+import com.example.construxflow.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +31,9 @@ public class QuotationRequestService {
     @Autowired
     private QuotationReqDocRepository quotationReqDocRepository;
 
+    @Autowired
+    private ManagerRepository managerRepository;
+
 
     @Autowired
     private QuotationRequestMapper quotationRequestMapper;
@@ -60,6 +58,7 @@ public class QuotationRequestService {
                 doc.setQuotationRequest(quotation_request);
             });
         }
+
 
         quotation_request.setCreatedDate(LocalDateTime.now());
 
@@ -173,7 +172,7 @@ public class QuotationRequestService {
             existingQuotation.setAdditional_info(updatedQuotation.getAdditional_info());
             existingQuotation.setQuotation_type(updatedQuotation.getQuotation_type());
             existingQuotation.setEstimated_cost(updatedQuotation.getEstimated_cost());
-            existingQuotation.setManager(updatedQuotation.getManager());
+//            existingQuotation.setManager(updatedQuotation.getManager());
 
             // Delete existing materials from database BEFORE clearing
             if (existingQuotation.getQuotationReqMaterials() != null && !existingQuotation.getQuotationReqMaterials().isEmpty()) {
