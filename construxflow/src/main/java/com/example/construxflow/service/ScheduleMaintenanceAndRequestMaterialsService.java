@@ -1,5 +1,11 @@
 package com.example.construxflow.service;
 
+import com.example.construxflow.dto.MaintenanceRequestOverviewDTO;
+import com.example.construxflow.entity.Equipment_scheduling;
+import com.example.construxflow.dto.MaintenanceRequestDetailDTO;
+import com.example.construxflow.entity.Equipment_scheduling;
+import com.example.construxflow.entity.Request_manintenance_materials;
+
 import com.example.construxflow.dto.ScheduleMaintenanceAndRequestMaterialsDTO;
 import com.example.construxflow.dto.ScheduleMaintenanceAndRequestMaterialsResponseDTO;
 import com.example.construxflow.dto.EquipmentSchedulingRequestDTO;
@@ -367,6 +373,48 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
         }
     }
 
+    public List<MaintenanceRequestOverviewDTO> getAllMaintenanceRequestsOverview() {
+        List<Equipment_scheduling> schedules = equipmentSchedulingRepository.findAll();
 
+        return schedules.stream().map(schedule -> {
+            MaintenanceRequestOverviewDTO dto = new MaintenanceRequestOverviewDTO();
+            dto.setEquipment(schedule.getEquipmentName());
+            dto.setDate(schedule.getDate().toString()); // Or format here
+            dto.setRequestedBy("System Admin"); // Placeholder or fetch from user if available
+            dto.setStatus(schedule.getStatus());
+            dto.setId(schedule.getId());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+
+    public MaintenanceRequestDetailDTO getMaintenanceRequestDetails(String equipmentId) {
+        Equipment_scheduling equipment = equipmentSchedulingRepository.findById(equipmentId)
+                .orElseThrow(() -> new RuntimeException("Equipment not found"));
+
+        List<Request_manintenance_materials> materials =
+                requestMaintenanceMaterialsRepository.findByEquipmentId(equipmentId);
+
+        List<MaintenanceRequestDetailDTO.MaterialItem> materialItems = materials.stream().map(item -> {
+            MaintenanceRequestDetailDTO.MaterialItem m = new MaintenanceRequestDetailDTO.MaterialItem();
+            m.setName(item.getItemName());
+            m.setDesc("Auto-generated description for " + item.getItemName()); // Replace if actual desc exists
+            m.setQty(item.getQuantity().toString());
+            m.setStock("N/A"); // Update if stock tracking is added
+            m.setNotes(item.getJustification());
+            return m;
+        }).collect(Collectors.toList());
+
+        MaintenanceRequestDetailDTO dto = new MaintenanceRequestDetailDTO();
+        dto.setEquipmentName(equipment.getEquipmentName());
+        dto.setRequestedBy("System Admin"); // Replace if user data exists
+        dto.setSchedule(equipment.getDate() + " - " + equipment.getTime());
+        dto.setPriority(equipment.getPriority() + " Priority");
+        dto.setAvailability("Currently assigned to Site A - Available after 3 days");
+        dto.setComments(equipment.getDescription());
+        dto.setMaterials(materialItems);
+
+        return dto;
+    }
 
 }
