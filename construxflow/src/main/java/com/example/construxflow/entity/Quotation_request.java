@@ -2,8 +2,10 @@ package com.example.construxflow.entity;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 
 import jakarta.persistence.CascadeType;
@@ -16,8 +18,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,10 +41,12 @@ public class Quotation_request {
     private String additional_info;
     private String quotation_type; // e.g., "Material", "Service", "Equipment"
     private BigDecimal estimated_cost;
+    private Long material_req_id;
+    private String projectId;
     
     @CreatedDate
-    @Column(name = "created_date", nullable = false, updatable = false)
-    private Date createdDate;
+    @Column(name = "created_date", updatable = false)
+    private LocalDateTime createdDate;
 
     @OneToMany(mappedBy = "quotationRequest", cascade = CascadeType.ALL)
     private List<Quotation_req_materials> quotationReqMaterials;
@@ -55,9 +57,7 @@ public class Quotation_request {
     @OneToMany(mappedBy = "quotationRequest", cascade = CascadeType.ALL)
     private List<Quotation_req_doc> quotationReqDocs;
 
-    @ManyToOne
-    @JoinColumn(name = "manager_id", referencedColumnName = "manager_id")
-    private Manager manager;
+    private String manager_id;
 
 
 
