@@ -116,6 +116,14 @@ public class QuotationMapper {
 //        quotation.setQuotationRequest();
 //        quotation.set
 
+        if (dto.getSupplierId() != null) {
+            Supplier supplier = new Supplier();
+            supplier.setSupplier_id(dto.getSupplierId());
+            quotation.setSupplier(supplier);
+        } else {
+            quotation.setSupplier(null);
+        }
+
         // Map Quotation Items
         if (dto.getItems() != null) {
             List<QuotationItem> items = dto.getItems().stream()
