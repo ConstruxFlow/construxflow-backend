@@ -15,6 +15,7 @@ import java.util.List;
 @Builder
 public class EquipmentSchedulingResponseDTO {
     private String id;
+    private Integer equipmentId;
     private String equipmentType;
     private String equipmentName;
     private String maintenanceType;
