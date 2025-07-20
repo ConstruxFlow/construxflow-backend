@@ -102,8 +102,17 @@ public class UserService {
 
         try {
             String verificationLink = firebaseService.generateEmailVerificationLink(dto.getEmail());
-            emailService.sendEmail(dto.getEmail(), "Verify your email",
-                    "Welcome! Please verify your email by clicking this link: " + verificationLink);
+            // Create professional email content
+            String emailSubject = "Welcome! Complete Your Account Setup";
+
+            String emailBody = createProfessionalWelcomeEmail(
+                    dto.getEmail(),
+                    dto.getPassword(),
+                    verificationLink
+            );
+
+            emailService.sendHtmlEmail(dto.getEmail(), emailSubject, emailBody);
+
         } catch (Exception e) {
             // Optionally log or handle email sending failure
             e.printStackTrace();
@@ -182,5 +191,82 @@ public class UserService {
                         .build()
                 );
     }
+
+    private String createProfessionalWelcomeEmail(String email, String password, String verificationLink) {
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 5px; }
+                .content { padding: 20px 0; }
+                .credentials-box { 
+                    background-color: #e9ecef; 
+                    padding: 15px; 
+                    border-radius: 5px; 
+                    margin: 20px 0; 
+                    border-left: 4px solid #007bff;
+                }
+                .verify-button { 
+                    display: inline-block; 
+                    background-color: #007bff; 
+                    color: white; 
+                    padding: 12px 30px; 
+                    text-decoration: none; 
+                    border-radius: 5px; 
+                    margin: 20px 0;
+                }
+                .footer { 
+                    margin-top: 30px; 
+                    padding-top: 20px; 
+                    border-top: 1px solid #dee2e6; 
+                    font-size: 12px; 
+                    color: #6c757d; 
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Welcome to ConstruxFlow!</h1>
+                </div>
+                
+                <div class="content">
+                    <p>Dear User,</p>
+                    
+                    <p>Thank you for registering with us. Your account has been successfully created and is ready to use.</p>
+                    
+                    <div class="credentials-box">
+                        <h3>Your Login Credentials:</h3>
+                        <p><strong>Username (Email):</strong> %s</p>
+                        <p><strong>Password:</strong> %s</p>
+                    </div>
+                    
+                    <p><strong>Important:</strong> Please verify your email address to activate your account and ensure you receive important notifications.</p>
+                    
+                    <div style="text-align: center;">
+                        <a href="%s" class="verify-button">Verify Email Address</a>
+                    </div>
+                    
+                    <p>If the button above doesn't work, copy and paste this link into your browser:</p>
+                    <p style="word-break: break-all; color: #007bff;">%s</p>
+                    
+                    <p><strong>Security Note:</strong> Please change your password after your first login for enhanced security.</p>
+                </div>
+                
+                <div class="footer">
+                    <p>If you didn't create this account, please ignore this email or contact our support team.</p>
+                    <p>This is an automated message, please do not reply to this email.</p>
+                    <p>&copy; 2025 [Your Company Name]. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """.formatted(email, password, verificationLink, verificationLink);
+    }
+
 
 }
