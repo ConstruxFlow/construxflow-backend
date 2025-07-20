@@ -35,6 +35,7 @@ public class ProjectController {
     @PostMapping("/create")
     public ResponseEntity<ProjectResponseDTO> createProject(
         @RequestParam("projectName") String projectName,
+        @RequestParam("managerId")  String managerId,
         @RequestParam("location") String location,
         @RequestParam("startDate") String startDate,
         @RequestParam("endDate") String endDate,
@@ -45,8 +46,9 @@ public class ProjectController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             java.util.List<PhaseRequestDTO> phases = Arrays.asList(mapper.readValue(phasesJson, PhaseRequestDTO[].class));
+
             ProjectRequestDTO dto = new ProjectRequestDTO(
-                projectName, location, startDate, endDate, progressStatus, boqFile, phases
+                managerId,  projectName, location, startDate, endDate, progressStatus, boqFile, phases
             );
             ProjectResponseDTO response = projectService.createProject(dto);
             return ResponseEntity.ok(response);
@@ -59,6 +61,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDTO> updateProject(
         @PathVariable String projectId,
         @RequestParam("projectName") String projectName,
+        @RequestParam("managerId") String managerId,
         @RequestParam("location") String location,
         @RequestParam("startDate") String startDate,
         @RequestParam("endDate") String endDate,
@@ -70,7 +73,7 @@ public class ProjectController {
         try {
             java.util.List<PhaseRequestDTO> phases = Arrays.asList(mapper.readValue(phasesJson, PhaseRequestDTO[].class));
             ProjectRequestDTO dto = new ProjectRequestDTO(
-                projectName, location, startDate, endDate, progressStatus, boqFile, phases
+                managerId, projectName, location, startDate, endDate, progressStatus, boqFile, phases
             );
             ProjectResponseDTO response = projectService.updateProject(projectId, dto);
             return ResponseEntity.ok(response);
