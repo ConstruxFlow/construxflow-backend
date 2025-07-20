@@ -44,6 +44,7 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
 
             EquipmentSchedulingRequestDTO equipmentDTO = new EquipmentSchedulingRequestDTO();
             equipmentDTO.setId(equipmentSchedulingId); // Backend-generated ID
+            equipmentDTO.setEquipmentId(dto.getEquipmentId());
             equipmentDTO.setEquipmentType(dto.getEquipmentType());
             equipmentDTO.setEquipmentName(dto.getEquipmentName());
             equipmentDTO.setMaintenanceType(dto.getMaintenanceType());
@@ -162,7 +163,7 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
             return yearPrefix + String.format("%03d", nextNumber);
         } catch (Exception e) {
             // Fallback to timestamp-based ID if database query fails
-            return "EQ-" + Calendar.getInstance().get(Calendar.YEAR) + "-" + System.currentTimeMillis() % 1000;
+            return "EQSCH-" + Calendar.getInstance().get(Calendar.YEAR) + "-" + System.currentTimeMillis() % 1000;
         }
     }
 

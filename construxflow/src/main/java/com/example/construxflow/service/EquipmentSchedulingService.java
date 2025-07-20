@@ -27,6 +27,7 @@ public class EquipmentSchedulingService {
     public EquipmentSchedulingResponseDTO createEquipmentScheduling(EquipmentSchedulingRequestDTO requestDTO) {
         Equipment_scheduling equipment = new Equipment_scheduling();
         equipment.setId(requestDTO.getId());
+        equipment.setEquipmentId(requestDTO.getEquipmentId());
         equipment.setEquipmentType(requestDTO.getEquipmentType());
         equipment.setEquipmentName(requestDTO.getEquipmentName());
         equipment.setMaintenanceType(requestDTO.getMaintenanceType());
@@ -61,6 +62,7 @@ public class EquipmentSchedulingService {
 
         if (existingEquipment.isPresent()) {
             Equipment_scheduling equipment = existingEquipment.get();
+            equipment.setEquipmentId(requestDTO.getEquipmentId());
             equipment.setEquipmentType(requestDTO.getEquipmentType());
             equipment.setEquipmentName(requestDTO.getEquipmentName());
             equipment.setMaintenanceType(requestDTO.getMaintenanceType());
@@ -224,6 +226,7 @@ public class EquipmentSchedulingService {
 
         return EquipmentSchedulingResponseDTO.builder()
                 .id(equipment.getId())
+                .equipmentId(equipment.getEquipmentId())
                 .equipmentType(equipment.getEquipmentType())
                 .equipmentName(equipment.getEquipmentName())
                 .maintenanceType(equipment.getMaintenanceType())
