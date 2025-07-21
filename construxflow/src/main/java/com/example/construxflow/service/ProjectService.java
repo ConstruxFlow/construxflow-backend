@@ -64,6 +64,7 @@ public class ProjectService {
         project.setStartDate(request.getStartDate());
         project.setEndDate(request.getEndDate());
         project.setProgressStatus(request.getProgressStatus());
+        project.setManagerId(request.getManagerId());
 
         project = projectRepository.save(project);
 

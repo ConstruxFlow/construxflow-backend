@@ -29,6 +29,7 @@ public class Material_request {
     private String status;
     private String additional_info;
     private String priority;
+    private String managerId;
 
     private Date request_date;
 
