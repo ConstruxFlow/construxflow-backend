@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -20,17 +21,25 @@ public class NextEquipmentScheduleController {
 
     @PostMapping("/setnextschedule")
     public ResponseEntity<?> schedule(@RequestBody NextEquipmentScheduleRequestDTO requestDTO) {
-        try{
-            NextEquipmentScheduleResponseDTO responseDTO = nextEquipmentScheduleService.scheduleNextEquipment(requestDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
-        }catch (Exception e){
+        try {
+            List<NextEquipmentScheduleResponseDTO> responseDTOs =
+                    nextEquipmentScheduleService.scheduleNextEquipment(requestDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTOs);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
+
     @GetMapping
-    public ResponseEntity<NextEquipmentScheduleResponseDTO> getNextScheduleByAssignId(@RequestParam String assignId) {
-        Optional<NextEquipmentScheduleResponseDTO> nextEquipmentResponsedto = nextEquipmentScheduleService.getNextScheduleDetailsByAssignId(assignId);
-        return nextEquipmentResponsedto.map(ResponseEntity::ok).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<List<NextEquipmentScheduleResponseDTO>> getNextScheduleByAssignId(@RequestParam String assignId) {
+        List<NextEquipmentScheduleResponseDTO> schedules = nextEquipmentScheduleService.getNextScheduleDetailsByAssignId(assignId);
+
+        if (schedules.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        return ResponseEntity.ok(schedules);
     }
+
 }

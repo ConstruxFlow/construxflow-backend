@@ -8,6 +8,7 @@ import com.example.construxflow.repository.EquipmentAssignTechnicianRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,37 +20,45 @@ public class EquipmentAssignTechnicianService {
     @Autowired
     private EquipmentAssignTechnicianRepository equipmentAssignTechnicianRepository;
 
-    public EquipmentAssignTechnicianResponseDTO assignTechnician(EquipmentAssignTechnicianRequestDTO requestDTO) {
+    public List<EquipmentAssignTechnicianResponseDTO> assignTechnicians(EquipmentAssignTechnicianRequestDTO requestDTO) {
+        List<EquipmentAssignTechnicianResponseDTO> responses = new ArrayList<>();
 
-        String AssignId = "ASSIGN"+ UUID.randomUUID().toString().substring(0,5).toUpperCase();
+        for (String technicianId : requestDTO.getTechnicianIds()) {
+            String assignId = "ASSIGN" + UUID.randomUUID().toString().substring(0, 5).toUpperCase();
 
-        Equipment_Assign_Technician equipmentAssignTechnician = new Equipment_Assign_Technician();
-        equipmentAssignTechnician.setAssignId(AssignId);
-        equipmentAssignTechnician.setEquipmentSchedulingId(requestDTO.getEquipmentSchedulingId());
-        equipmentAssignTechnician.setTechnicianId(requestDTO.getTechnicianId());
-        equipmentAssignTechnician.setDuration(requestDTO.getDuration());
-        equipmentAssignTechnician.setNotes(requestDTO.getNotes());
-        equipmentAssignTechnician.setStartDate(requestDTO.getStartDate());
-        equipmentAssignTechnician.setEndDate(requestDTO.getEndDate());
-        equipmentAssignTechnician.setStartTime(requestDTO.getStartTime());
-        equipmentAssignTechnician.setEndTime(requestDTO.getEndTime());
-        equipmentAssignTechnician.setStatus(requestDTO.getStatus());
+            Equipment_Assign_Technician technician = new Equipment_Assign_Technician();
+            technician.setAssignId(assignId);
+            technician.setEquipmentSchedulingId(requestDTO.getEquipmentSchedulingId());
+            technician.setTechnicianId(technicianId);
+            technician.setDuration(requestDTO.getDuration());
+            technician.setNotes(requestDTO.getNotes());
+            technician.setStartDate(requestDTO.getStartDate());
+            technician.setEndDate(requestDTO.getEndDate());
+            technician.setStartTime(requestDTO.getStartTime());
+            technician.setEndTime(requestDTO.getEndTime());
+            technician.setStatus(requestDTO.getStatus());
 
-        Equipment_Assign_Technician savedAssign = equipmentAssignTechnicianRepository.save(equipmentAssignTechnician);
+            Equipment_Assign_Technician saved = equipmentAssignTechnicianRepository.save(technician);
 
-        EquipmentAssignTechnicianResponseDTO responseDTO = new EquipmentAssignTechnicianResponseDTO();
-        responseDTO.setAssignId(savedAssign.getAssignId());
-        responseDTO.setEquipmentSchedulingId(savedAssign.getEquipmentSchedulingId());
-        responseDTO.setTechnicianId(savedAssign.getTechnicianId());
-        responseDTO.setDuration(savedAssign.getDuration());
-        responseDTO.setNotes(savedAssign.getNotes());
-        responseDTO.setStartDate(savedAssign.getStartDate());
-        responseDTO.setEndDate(savedAssign.getEndDate());
-        responseDTO.setStartTime(savedAssign.getStartTime());
-        responseDTO.setEndTime(savedAssign.getEndTime());
-        responseDTO.setStatus(savedAssign.getStatus());
-        return responseDTO;
+            EquipmentAssignTechnicianResponseDTO response = new EquipmentAssignTechnicianResponseDTO(
+                    saved.getAssignId(),
+                    saved.getEquipmentSchedulingId(),
+                    saved.getTechnicianId(),
+                    saved.getDuration(),
+                    saved.getNotes(),
+                    saved.getStartDate(),
+                    saved.getEndDate(),
+                    saved.getStartTime(),
+                    saved.getEndTime(),
+                    saved.getStatus()
+            );
+
+            responses.add(response);
+        }
+
+        return responses;
     }
+
 
     public List<EquipmentAssignTechnicianResponseDTO> getEquipmentAssignDetails(){
         return equipmentAssignTechnicianRepository.findAll()
@@ -57,17 +66,20 @@ public class EquipmentAssignTechnicianService {
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
     }
+//
+//    public Optional<EquipmentAssignTechnicianResponseDTO> getEquipmentSchedulingDetailsById(String schedulingId){
+//        return equipmentAssignTechnicianRepository.findByEquipmentSchedulingId(schedulingId)
+//                .map(this::mapToResponseDTO);
+//
+//    }
 
-    public Optional<EquipmentAssignTechnicianResponseDTO> getEquipmentSchedulingDetailsById(String schedulingId){
-        return equipmentAssignTechnicianRepository.findByEquipmentSchedulingId(schedulingId)
-                .map(this::mapToResponseDTO);
-
+    public List<EquipmentAssignTechnicianResponseDTO> getAssignmentsByScheduleId(String scheduleId) {
+        List<Equipment_Assign_Technician> assignments = equipmentAssignTechnicianRepository.findByEquipmentSchedulingId(scheduleId);
+        return assignments.stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    public Optional<EquipmentAssignTechnicianResponseDTO> getEquipmentSchedulingDetailsByAssignId(String assignId){
-        return equipmentAssignTechnicianRepository.findById(assignId)
-                .map(this::mapToResponseDTO);
-    }
 
     public EquipmentAssignTechnicianResponseDTO updateAssignStatus(String id, String newStatus){
         Equipment_Assign_Technician assignTechnician = equipmentAssignTechnicianRepository.findById(id).
