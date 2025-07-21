@@ -34,6 +34,7 @@ public class ProjectController {
 
     @PostMapping("/create")
     public ResponseEntity<ProjectResponseDTO> createProject(
+        @RequestParam("managerId")  String managerId,
         @RequestParam("projectName") String projectName,
         @RequestParam("location") String location,
         @RequestParam("startDate") String startDate,
@@ -41,12 +42,14 @@ public class ProjectController {
         @RequestParam("progressStatus") String progressStatus,
         @RequestParam(value = "boqFile", required = false) MultipartFile boqFile,
         @RequestParam("phases") String phasesJson
+
     ) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             java.util.List<PhaseRequestDTO> phases = Arrays.asList(mapper.readValue(phasesJson, PhaseRequestDTO[].class));
+
             ProjectRequestDTO dto = new ProjectRequestDTO(
-                projectName, location, startDate, endDate, progressStatus, boqFile, phases
+                    managerId,projectName, location, startDate, endDate, progressStatus, boqFile, phases
             );
             ProjectResponseDTO response = projectService.createProject(dto);
             return ResponseEntity.ok(response);
@@ -58,6 +61,7 @@ public class ProjectController {
     @PutMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDTO> updateProject(
         @PathVariable String projectId,
+        @RequestParam("managerId")  String managerId,
         @RequestParam("projectName") String projectName,
         @RequestParam("location") String location,
         @RequestParam("startDate") String startDate,
@@ -70,7 +74,7 @@ public class ProjectController {
         try {
             java.util.List<PhaseRequestDTO> phases = Arrays.asList(mapper.readValue(phasesJson, PhaseRequestDTO[].class));
             ProjectRequestDTO dto = new ProjectRequestDTO(
-                projectName, location, startDate, endDate, progressStatus, boqFile, phases
+                    managerId, projectName, location, startDate, endDate, progressStatus, boqFile, phases
             );
             ProjectResponseDTO response = projectService.updateProject(projectId, dto);
             return ResponseEntity.ok(response);

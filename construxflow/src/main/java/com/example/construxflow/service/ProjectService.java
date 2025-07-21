@@ -59,11 +59,13 @@ public class ProjectService {
 
         Project project = new Project();
         project.setProjectId(projectId);
+        project.setManagerId(request.getManagerId());
         project.setProjectName(request.getProjectName());
         project.setLocation(request.getLocation());
         project.setStartDate(request.getStartDate());
         project.setEndDate(request.getEndDate());
         project.setProgressStatus(request.getProgressStatus());
+        project.setManagerId(request.getManagerId());
 
         project = projectRepository.save(project);
 
@@ -361,6 +363,7 @@ public class ProjectService {
     private ProjectResponseDTO convertToResponseDTO(Project project) {
         ProjectResponseDTO dto = new ProjectResponseDTO();
         dto.setProjectId(project.getProjectId());
+        dto.setManagerId(project.getManagerId());
         dto.setProjectName(project.getProjectName());
         dto.setLocation(project.getLocation());
         dto.setStartDate(project.getStartDate());

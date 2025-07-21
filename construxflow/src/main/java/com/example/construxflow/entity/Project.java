@@ -34,6 +34,10 @@ public class Project {
     @Column(name = "end_date")
     private String endDate;
 
+    @Column(name = "manager_id")
+    private String managerId;
+
+
     @Column(name = "progress_status")
     private String progressStatus;
 
