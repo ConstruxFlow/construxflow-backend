@@ -10,8 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectResponseDTO {
-    private String projectId;
     private String managerId;
+    private String projectId;
     private String projectName;
     private String location;
     private String startDate;
