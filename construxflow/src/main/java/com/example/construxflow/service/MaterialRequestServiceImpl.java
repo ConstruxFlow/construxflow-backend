@@ -81,6 +81,7 @@ public class MaterialRequestServiceImpl implements MaterialRequestService {
                     Requested_material reqMat = new Requested_material();
                     reqMat.setMaterial(material);
                     reqMat.setQuantity(materialItem.getQuantity());
+                    reqMat.setRate(materialItem.getUnitPrice());
                     reqMat.setMaterial_request(savedRequest);
                     reqMat.setStatus("Pending"); // Set status to Pending
                     requestedMaterialRepository.save(reqMat);

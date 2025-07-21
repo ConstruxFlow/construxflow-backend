@@ -305,6 +305,7 @@ public class ProjectService {
         dto.setPhaseName(phaseMaterial.getProject_phase().getPhase_name());
         dto.setMaterialName(phaseMaterial.getMaterial().getMaterialName());
         dto.setQuantity(phaseMaterial.getQuantity());
+        dto.setUnitPrice(phaseMaterial.getRate());
         dto.setUnitOfMeasurement(phaseMaterial.getMaterial().getUnitOfMeasurement());
         // Lookup status from Requested_material
         List<Requested_material> requestedMaterials = requestedMaterialRepository
