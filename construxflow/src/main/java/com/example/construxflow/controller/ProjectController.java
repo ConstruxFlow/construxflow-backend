@@ -36,7 +36,6 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDTO> createProject(
         @RequestParam("managerId")  String managerId,
         @RequestParam("projectName") String projectName,
-        @RequestParam("managerId")  String managerId,
         @RequestParam("location") String location,
         @RequestParam("startDate") String startDate,
         @RequestParam("endDate") String endDate,
@@ -64,7 +63,6 @@ public class ProjectController {
         @PathVariable String projectId,
         @RequestParam("managerId")  String managerId,
         @RequestParam("projectName") String projectName,
-        @RequestParam("managerId") String managerId,
         @RequestParam("location") String location,
         @RequestParam("startDate") String startDate,
         @RequestParam("endDate") String endDate,
