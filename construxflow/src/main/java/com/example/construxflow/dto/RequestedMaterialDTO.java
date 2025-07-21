@@ -17,5 +17,5 @@ public class RequestedMaterialDTO {
     private BigDecimal quantity;
     private String unitOfMeasurement;
     private String status;
-    private String unitPrice;
+    private BigDecimal unitPrice;
 }
