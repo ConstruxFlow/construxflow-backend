@@ -100,6 +100,7 @@ public class MaterialRequestController {
                         reqMatDTO.setRequestedMaterialId(reqMat.getRequested_material_id());
                         reqMatDTO.setQuantity(reqMat.getQuantity());
                         reqMatDTO.setStatus(reqMat.getStatus());
+                        reqMatDTO.setUnitPrice(reqMat.getRate());
 
                         if (reqMat.getMaterial() != null) {
                             reqMatDTO.setMaterialId(reqMat.getMaterial().getMaterial_id());

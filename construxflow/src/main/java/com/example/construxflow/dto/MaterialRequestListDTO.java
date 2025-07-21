@@ -14,6 +14,7 @@ public class MaterialRequestListDTO {
     private String projectName;
     private String phaseName;
     private String materialName;
+    private BigDecimal unitPrice;
     private BigDecimal quantity;
     private String unitOfMeasurement;
     private String status; // NOT_REQUESTED, PENDING, APPROVED, REJECTED
