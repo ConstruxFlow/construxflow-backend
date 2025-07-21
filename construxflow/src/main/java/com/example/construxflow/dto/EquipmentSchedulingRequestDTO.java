@@ -12,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class EquipmentSchedulingRequestDTO {
     private String id;
+    private Integer equipmentId;
     private String equipmentType;
     private String equipmentName;
     private String maintenanceType;
