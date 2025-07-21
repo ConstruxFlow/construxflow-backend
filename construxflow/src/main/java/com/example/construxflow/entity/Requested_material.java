@@ -24,6 +24,8 @@ public class Requested_material {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long requested_material_id;
 
+
+    private BigDecimal rate;
     private BigDecimal quantity;
 
     private String status; // e.g., 'Not Requested', 'Pending', 'Approved', 'Rejected'
