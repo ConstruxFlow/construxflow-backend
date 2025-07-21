@@ -36,6 +36,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDTO> createProject(
         @RequestParam("managerId")  String managerId,
         @RequestParam("projectName") String projectName,
+        @RequestParam("managerId")  String managerId,
         @RequestParam("location") String location,
         @RequestParam("startDate") String startDate,
         @RequestParam("endDate") String endDate,
@@ -47,6 +48,7 @@ public class ProjectController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             java.util.List<PhaseRequestDTO> phases = Arrays.asList(mapper.readValue(phasesJson, PhaseRequestDTO[].class));
+
             ProjectRequestDTO dto = new ProjectRequestDTO(
                     managerId,projectName, location, startDate, endDate, progressStatus, boqFile, phases
             );
@@ -62,6 +64,7 @@ public class ProjectController {
         @PathVariable String projectId,
         @RequestParam("managerId")  String managerId,
         @RequestParam("projectName") String projectName,
+        @RequestParam("managerId") String managerId,
         @RequestParam("location") String location,
         @RequestParam("startDate") String startDate,
         @RequestParam("endDate") String endDate,
@@ -73,7 +76,7 @@ public class ProjectController {
         try {
             java.util.List<PhaseRequestDTO> phases = Arrays.asList(mapper.readValue(phasesJson, PhaseRequestDTO[].class));
             ProjectRequestDTO dto = new ProjectRequestDTO(
-                    managerId,projectName, location, startDate, endDate, progressStatus, boqFile, phases
+                    managerId, projectName, location, startDate, endDate, progressStatus, boqFile, phases
             );
             ProjectResponseDTO response = projectService.updateProject(projectId, dto);
             return ResponseEntity.ok(response);

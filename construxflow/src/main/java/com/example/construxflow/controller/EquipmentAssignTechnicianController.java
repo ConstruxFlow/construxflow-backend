@@ -29,7 +29,7 @@ public class EquipmentAssignTechnicianController {
     @PostMapping("/addassign")
     public ResponseEntity<?> addAssign(@RequestBody EquipmentAssignTechnicianRequestDTO requestDTO, HttpServletRequest request) {
         try {
-            FirebaseToken token = authService.checkAuth(request);
+//            FirebaseToken token = authService.checkAuth(request);
             EquipmentAssignTechnicianResponseDTO responseDTO = equipmentAssignTechnicianService.assignTechnician(requestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (Exception e) {
