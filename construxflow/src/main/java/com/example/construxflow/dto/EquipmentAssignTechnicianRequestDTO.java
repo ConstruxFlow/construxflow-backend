@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class EquipmentAssignTechnicianRequestDTO {
     private String equipmentSchedulingId;
-    private String technicianId;
+    private List<String> technicianIds;
     private String duration;
     private String notes;
     private String startDate;
