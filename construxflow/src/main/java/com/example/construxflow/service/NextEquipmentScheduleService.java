@@ -7,8 +7,11 @@ import com.example.construxflow.repository.NextEquipmentScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class NextEquipmentScheduleService {
@@ -16,41 +19,50 @@ public class NextEquipmentScheduleService {
     @Autowired
     private NextEquipmentScheduleRepository nextEquipmentScheduleRepository;
 
-    public NextEquipmentScheduleResponseDTO scheduleNextEquipment(NextEquipmentScheduleRequestDTO requestDTO) {
+    public List<NextEquipmentScheduleResponseDTO> scheduleNextEquipment(NextEquipmentScheduleRequestDTO requestDTO) {
+        List<NextEquipmentScheduleResponseDTO> responseList = new ArrayList<>();
 
-        String nextScheduleId = "NSCH-" + UUID.randomUUID().toString().substring(0, 5).toUpperCase();
+        for (String technicianId : requestDTO.getTechnicianIds()) {
+            String nextScheduleId = "NSCH-" + UUID.randomUUID().toString().substring(0, 5).toUpperCase();
 
-        Next_Equipment_Schedule nextSchedule = new Next_Equipment_Schedule();
-        nextSchedule.setNextScheduleId(nextScheduleId);
-        nextSchedule.setAssignId(requestDTO.getAssignId());
-        nextSchedule.setEquipmentScheduleId(requestDTO.getEquipmentScheduleId());
-        nextSchedule.setNextMaintenanceType(requestDTO.getNextMaintenanceType());
-        nextSchedule.setNextDate(requestDTO.getNextDate());
-        nextSchedule.setPriority(requestDTO.getPriority());
-        nextSchedule.setEstimateDuration(requestDTO.getEstimateDuration());
-        nextSchedule.setTechnicianId(requestDTO.getTechnicianId());
+            Next_Equipment_Schedule schedule = new Next_Equipment_Schedule();
+            schedule.setNextScheduleId(nextScheduleId);
+            schedule.setAssignId(requestDTO.getAssignId());
+            schedule.setEquipmentScheduleId(requestDTO.getEquipmentScheduleId());
+            schedule.setNextMaintenanceType(requestDTO.getNextMaintenanceType());
+            schedule.setNextDate(requestDTO.getNextDate());
+            schedule.setEstimateDuration(requestDTO.getEstimateDuration());
+            schedule.setPriority(requestDTO.getPriority());
+            schedule.setTechnicianId(technicianId);
 
-        Next_Equipment_Schedule saved = nextEquipmentScheduleRepository.save(nextSchedule);
+            Next_Equipment_Schedule saved = nextEquipmentScheduleRepository.save(schedule);
 
-        NextEquipmentScheduleResponseDTO responseDTO = new NextEquipmentScheduleResponseDTO();
-        responseDTO.setNextScheduleId(saved.getNextScheduleId());
-        responseDTO.setEquipmentScheduleId(saved.getEquipmentScheduleId());
-        responseDTO.setAssignId(saved.getAssignId());
-        responseDTO.setNextMaintenanceType(saved.getNextMaintenanceType());
-        responseDTO.setNextDate(saved.getNextDate());
-        responseDTO.setPriority(saved.getPriority());
-        responseDTO.setEstimateDuration(saved.getEstimateDuration());
-        responseDTO.setTechnicianId(saved.getTechnicianId());
-        return responseDTO;
+            NextEquipmentScheduleResponseDTO dto = new NextEquipmentScheduleResponseDTO();
+            dto.setNextScheduleId(saved.getNextScheduleId());
+            dto.setAssignId(saved.getAssignId());
+            dto.setEquipmentScheduleId(saved.getEquipmentScheduleId());
+            dto.setNextMaintenanceType(saved.getNextMaintenanceType());
+            dto.setNextDate(saved.getNextDate());
+            dto.setEstimateDuration(saved.getEstimateDuration());
+            dto.setPriority(saved.getPriority());
+            dto.setTechnicianId(saved.getTechnicianId());
 
+            responseList.add(dto);
+        }
 
-
+        return responseList;
     }
 
-    public Optional<NextEquipmentScheduleResponseDTO> getNextScheduleDetailsByAssignId(String assignId) {
-        return nextEquipmentScheduleRepository.findByAssignId(assignId)
-                .map(this::mapToResponseDTO);
+
+    public List<NextEquipmentScheduleResponseDTO> getNextScheduleDetailsByAssignId(String assignId) {
+        List<Next_Equipment_Schedule> nextSchedules = nextEquipmentScheduleRepository.findByAssignId(assignId);
+
+        return nextSchedules.stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
     }
+
+
 
     public NextEquipmentScheduleResponseDTO mapToResponseDTO(Next_Equipment_Schedule nextEquipmentSchedule) {
         return NextEquipmentScheduleResponseDTO.builder()
