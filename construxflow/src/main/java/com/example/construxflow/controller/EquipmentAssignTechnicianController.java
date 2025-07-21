@@ -30,7 +30,7 @@ public class EquipmentAssignTechnicianController {
     public ResponseEntity<?> addAssign(@RequestBody EquipmentAssignTechnicianRequestDTO requestDTO, HttpServletRequest request) {
         try {
 //            FirebaseToken token = authService.checkAuth(request);
-            EquipmentAssignTechnicianResponseDTO responseDTO = equipmentAssignTechnicianService.assignTechnician(requestDTO);
+            List<EquipmentAssignTechnicianResponseDTO> responseDTO = equipmentAssignTechnicianService.assignTechnicians(requestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (Exception e) {
             // Optionally log the exception here
@@ -50,17 +50,24 @@ public class EquipmentAssignTechnicianController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<EquipmentAssignTechnicianResponseDTO> getEquipmentAssignDetailsById(@RequestParam String id) {
-        Optional<EquipmentAssignTechnicianResponseDTO> equipmentResponseDto = equipmentAssignTechnicianService.getEquipmentSchedulingDetailsById(id);
-        return equipmentResponseDto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+//    @GetMapping
+//    public ResponseEntity<EquipmentAssignTechnicianResponseDTO> getEquipmentAssignDetailsById(@RequestParam String id) {
+//        Optional<EquipmentAssignTechnicianResponseDTO> equipmentResponseDto = equipmentAssignTechnicianService.getAssignmentsByScheduleId(id);
+//        return equipmentResponseDto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+//    }
+
+    @GetMapping("getbyassignId")
+    public ResponseEntity<List<EquipmentAssignTechnicianResponseDTO>> getAssignmentsByScheduleId(
+            @RequestParam(name = "scheduleId") String scheduleId) {
+
+        List<EquipmentAssignTechnicianResponseDTO> response =
+                equipmentAssignTechnicianService.getAssignmentsByScheduleId(scheduleId);
+
+        return response.isEmpty()
+                ? ResponseEntity.notFound().build()
+                : ResponseEntity.ok(response);
     }
 
-    @GetMapping("/getbyassignId")
-    public ResponseEntity<EquipmentAssignTechnicianResponseDTO> getEquipmentAssignDetailsByAssignId(@RequestParam String id) {
-        Optional<EquipmentAssignTechnicianResponseDTO> equipmentResponseDto = equipmentAssignTechnicianService.getEquipmentSchedulingDetailsByAssignId(id);
-        return equipmentResponseDto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
 
     @PutMapping("/status")
     public ResponseEntity<EquipmentAssignTechnicianResponseDTO> updateEquipmentAssignStatus(
