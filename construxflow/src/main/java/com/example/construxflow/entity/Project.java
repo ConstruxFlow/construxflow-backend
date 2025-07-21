@@ -23,9 +23,6 @@ public class Project {
     @Column(name = "project_id") // maps to DB column
     private String projectId;
 
-//    @Column(name = "manager_id")
-    private String managerId;
-
     @Column(name = "project_name")
     private String projectName;
 
@@ -36,6 +33,10 @@ public class Project {
 
     @Column(name = "end_date")
     private String endDate;
+
+    @Column(name = "manager_id")
+    private String managerId;
+
 
     @Column(name = "progress_status")
     private String progressStatus;
