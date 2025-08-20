@@ -103,6 +103,14 @@ public class EquipmentSchedulingService {
                 .collect(Collectors.toList());
     }
 
+    // Get equipment scheduling by equipment ID
+    public List<EquipmentSchedulingResponseDTO> getEquipmentSchedulingByEquipmentId(Integer equipmentId) {
+        return equipmentSchedulingRepository.findByEquipmentId(equipmentId)
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     // Get equipment scheduled for a specific date
     public List<EquipmentSchedulingResponseDTO> getEquipmentByDate(Date date) {
         return equipmentSchedulingRepository.findByDate(date)

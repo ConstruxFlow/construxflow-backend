@@ -14,6 +14,7 @@ public class Equipment_Assign_Technician {
 
     @Id
     private String assignId;
+    private String equipmentId;
     private String equipmentSchedulingId;
     private String technicianId;
     private String duration;
