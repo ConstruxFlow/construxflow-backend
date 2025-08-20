@@ -78,4 +78,14 @@ public class EquipmentAssignTechnicianController {
         return ResponseEntity.ok(updated);
     }
 
+    @GetMapping("getbytechnicianId")
+    public ResponseEntity<List<EquipmentAssignTechnicianResponseDTO>> getAssignmentsByTechnicianId(
+            @RequestParam String id){
+        List<EquipmentAssignTechnicianResponseDTO> response =
+                equipmentAssignTechnicianService.getAssignmentsByTechnicianId(id);
+
+        return response.isEmpty()
+                ? ResponseEntity.notFound().build()
+                : ResponseEntity.ok(response);
+    }
 }

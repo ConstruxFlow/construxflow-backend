@@ -100,6 +100,23 @@ public class EquipmentSchedulingController {
         return ResponseEntity.ok(equipmentList);
     }
 
+    // Get equipment scheduling by equipment ID
+    @GetMapping("/equipment")
+    public ResponseEntity<List<EquipmentSchedulingResponseDTO>> getEquipmentSchedulingByEquipmentId(@RequestParam String equipmentId) {
+        try {
+            Integer equipmentIdInt = Integer.parseInt(equipmentId);
+            List<EquipmentSchedulingResponseDTO> equipmentSchedulingList = equipmentSchedulingService.getEquipmentSchedulingByEquipmentId(equipmentIdInt);
+
+            if (equipmentSchedulingList.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(equipmentSchedulingList);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     // Search equipment by name (partial match)
     @GetMapping("/search/name")
     public ResponseEntity<List<EquipmentSchedulingResponseDTO>> searchEquipmentByName(@RequestParam String searchTerm) {
