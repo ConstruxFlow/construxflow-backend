@@ -12,10 +12,12 @@ import java.util.List;
 public class NextEquipmentScheduleRequestDTO {
 
     private String assignId;
+    private String equipmentId;
     private String equipmentScheduleId;
     private String nextMaintenanceType;
     private String nextDate;
     private String estimateDuration;
     private String priority;
     private List<String> technicianIds;
+    private String lastMaintenanceDate;
 }

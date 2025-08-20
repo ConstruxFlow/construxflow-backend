@@ -30,4 +30,5 @@ public class Equipment {
     private String status;
     private String nextMaintenance;
     private String notes;
+
 }
