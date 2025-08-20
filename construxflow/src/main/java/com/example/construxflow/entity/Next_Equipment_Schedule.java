@@ -15,11 +15,13 @@ public class Next_Equipment_Schedule {
     @Id
     private String nextScheduleId;
     private String assignId;
+    private String equipmentId;
     private String equipmentScheduleId;
     private String nextMaintenanceType;
     private String nextDate;
     private String estimateDuration;
     private String priority;
     private String technicianId;
+    private String lastMaintenanceDate;
 
 }
