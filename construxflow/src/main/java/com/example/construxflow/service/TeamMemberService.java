@@ -91,6 +91,22 @@ public class TeamMemberService {
                 .map(this::mapToResponseDTO);
     }
 
+    public TeamMemberResponseDTO updateTeamMemberStatus(String empId, String newStatus) {
+        Team_Member teamMember = teamMemberRepository.findById(empId)
+                .orElseThrow(() -> new RuntimeException("Team member not found with empId: " + empId));
+
+        // Convert string status to enum
+        try {
+            Team_Member.AvailabilityStatus status = Team_Member.AvailabilityStatus.valueOf(newStatus.toUpperCase());
+            teamMember.setAvailabilityStatus(status);
+
+            Team_Member updatedMember = teamMemberRepository.save(teamMember);
+            return mapToResponseDTO(updatedMember);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid status value: " + newStatus);
+        }
+    }
+
     public TeamMemberResponseDTO mapToResponseDTO(Team_Member teamMember) {
         TeamMemberResponseDTO dto = new TeamMemberResponseDTO();
         dto.setEmpId(teamMember.getEmpId());

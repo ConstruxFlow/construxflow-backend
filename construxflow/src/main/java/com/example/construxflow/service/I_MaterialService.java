@@ -6,6 +6,8 @@ import com.example.construxflow.repository.I_MaterialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class I_MaterialService {
 
@@ -27,4 +29,9 @@ public class I_MaterialService {
 
         return materialRepository.save(material);
     }
+
+    public List<I_Material> getAllMaterials() {
+        return materialRepository.findAll();
+    }
+
 }
