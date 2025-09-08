@@ -1,14 +1,11 @@
 package com.example.construxflow.dto;
 
-import lombok.*;
 import com.example.construxflow.entity.EquipmentStatus;
+import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class EquipmentDTO {
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class EquipmentResponseDTO {
+    private Long id;
     private String type;
     private String name;
     private String category;
