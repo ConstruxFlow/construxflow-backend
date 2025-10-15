@@ -15,6 +15,7 @@ public class EquipmentDTO {
     private String brand;
     private String model;
     private String serialNumber;
+    private Integer quantity;
     private String condition;
     private String purchaseDate;
     private String purchaseSource;
