@@ -93,6 +93,7 @@ public class EquipmentService {
                 .brand(dto.getBrand())
                 .model(dto.getModel())
                 .serialNumber(dto.getSerialNumber())
+                .quantity(dto.getQuantity())
                 .condition(dto.getCondition())
                 .purchaseDate(dto.getPurchaseDate())
                 .purchaseSource(dto.getPurchaseSource())
@@ -126,6 +127,7 @@ public class EquipmentService {
         existing.setBrand(dto.getBrand());
         existing.setModel(dto.getModel());
         existing.setSerialNumber(dto.getSerialNumber());
+        existing.setQuantity(dto.getQuantity());
         existing.setCondition(dto.getCondition());
         existing.setPurchaseDate(dto.getPurchaseDate());
         existing.setPurchaseSource(dto.getPurchaseSource());
@@ -259,5 +261,19 @@ public class EquipmentService {
     // ---------- Optional helpers if you need strict 404s elsewhere ----------
     private EntityNotFoundException notFound(Long id) {
         return new EntityNotFoundException("Equipment not found: " + id);
+    }
+
+    @Transactional
+    public Equipment updateEquipmentStock(Long id, Integer newQuantity) {
+        Equipment equipment = equipmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Equipment not found with id: " + id));
+
+        equipment.setQuantity(newQuantity);
+        return equipmentRepository.save(equipment);
+    }
+
+    // Search equipment by name
+    public List<Equipment> searchEquipmentByName(String name) {
+        return equipmentRepository.findByNameContainingIgnoreCase(name);
     }
 }

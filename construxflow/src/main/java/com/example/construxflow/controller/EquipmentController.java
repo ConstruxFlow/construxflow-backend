@@ -107,4 +107,26 @@ public class EquipmentController {
     ) {
         return ResponseEntity.ok(equipmentService.searchListItems(search, status, page, size, sortBy, sortDir));
     }
+
+    // Add these endpoints to your existing EquipmentController
+
+    // Update equipment stock
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<Equipment> updateEquipmentStock(
+            @PathVariable Long id,
+            @RequestParam Integer quantity) {
+        try {
+            Equipment equipment = equipmentService.updateEquipmentStock(id, quantity);
+            return ResponseEntity.ok(equipment);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Search equipment by name
+    @GetMapping("/search-by-name")
+    public ResponseEntity<List<Equipment>> searchEquipmentByName(@RequestParam String name) {
+        List<Equipment> equipment = equipmentService.searchEquipmentByName(name);
+        return ResponseEntity.ok(equipment);
+    }
 }
