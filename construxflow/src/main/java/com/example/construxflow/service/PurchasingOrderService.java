@@ -26,7 +26,7 @@ public class PurchasingOrderService {
 
 
     public PurchasingOrderResponseDTO findLatestPurchasingOrder() {
-        Pageable pageable = PageRequest.of(0, 1); // Get only the first (latest) result
+//        Pageable pageable = PageRequest.of(0, 1); // Get only the first (latest) result
         List<PurchasingOrder> purchasingOrders = purchasingOrderRepository.findAllOrderByOrderDateDesc();
         if (!purchasingOrders.isEmpty()) {
             PurchasingOrder latestOrder = purchasingOrders.get(0);
@@ -98,6 +98,18 @@ public class PurchasingOrderService {
     // Find all purchasing orders
     public List<PurchasingOrderResponseDTO> findAllPurchasingOrders() {
         List<PurchasingOrder> purchasingOrders = purchasingOrderRepository.findAll();
+
+        return purchasingOrders.stream()
+                .map(purchasingOrder -> {
+                    forceLoadCollections(purchasingOrder);
+                    return purchasingOrderMapper.toResponseDTO(purchasingOrder);
+                })
+                .toList();
+    }
+
+    // Find purchasing orders by project ID
+    public List<PurchasingOrderResponseDTO> findPurchasingOrdersByProjectId(String projectId) {
+        List<PurchasingOrder> purchasingOrders = purchasingOrderRepository.findByProjectId(projectId);
 
         return purchasingOrders.stream()
                 .map(purchasingOrder -> {
@@ -181,6 +193,7 @@ public class PurchasingOrderService {
             // Update basic fields
             existingPurchasingOrder.setPonumber(updatedPurchasingOrder.getPonumber());
             existingPurchasingOrder.setOrder_date(updatedPurchasingOrder.getOrder_date());
+            existingPurchasingOrder.setRequired_date(updatedPurchasingOrder.getRequired_date());
             existingPurchasingOrder.setStatus(updatedPurchasingOrder.getStatus());
             existingPurchasingOrder.setAdditional_info(updatedPurchasingOrder.getAdditional_info());
             existingPurchasingOrder.setSubTotal(updatedPurchasingOrder.getSubTotal());

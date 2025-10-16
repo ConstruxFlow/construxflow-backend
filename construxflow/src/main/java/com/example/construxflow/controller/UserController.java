@@ -40,15 +40,19 @@ public class UserController {
         if (userDto.getUserRole() == null) {
             return ResponseEntity.badRequest().body("User role is required");
         }
+        System.out.println("\n"+userDto+"\n");
         try{
             UserResponseDetailsDTO savedUser = userService.createUser(userDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
         }catch (DataIntegrityViolationException e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
         } catch (ValidationException e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.badRequest().body("Invalid user data: " + e.getMessage());
         } catch (Exception e) {
 //            Flogger.error("Registration failed", e);
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Registration failed: " + e.getMessage());
         }

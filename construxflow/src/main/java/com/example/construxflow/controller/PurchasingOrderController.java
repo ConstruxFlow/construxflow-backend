@@ -78,6 +78,18 @@ public class PurchasingOrderController {
         }
     }
 
+    // Get purchasing orders by project ID
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<ApiResponse<?>> getPurchasingOrdersByProjectId(@PathVariable String projectId) {
+        try {
+            List<PurchasingOrderResponseDTO> response = purchasingOrderService.findPurchasingOrdersByProjectId(projectId);
+            return ResponseEntity.ok(ApiResponse.success("Purchasing Orders retrieved successfully", response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to retrieve purchasing orders", e.getMessage()));
+        }
+    }
+
     // Get all purchasing orders
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<?>> getAllPurchasingOrders() {
