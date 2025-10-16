@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EquipmentAssignTechnicianResponseDTO {
     private String assignId;
+    private String equipmentId;
     private String equipmentSchedulingId;
     private String technicianId;
     private String duration;

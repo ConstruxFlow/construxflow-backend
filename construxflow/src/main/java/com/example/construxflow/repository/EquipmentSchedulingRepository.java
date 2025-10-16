@@ -69,4 +69,7 @@ public interface EquipmentSchedulingRepository extends JpaRepository<Equipment_s
 
     @Query("SELECT e.id FROM Equipment_scheduling e WHERE e.id LIKE CONCAT('EQ-', :year, '-%') ORDER BY e.id DESC LIMIT 1")
     String findLastEquipmentSchedulingIdForYear(@Param("year") int year);
+
+    // Find by equipment ID
+    List<Equipment_scheduling> findByEquipmentId(Integer equipmentId);
 }

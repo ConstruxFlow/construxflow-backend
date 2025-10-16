@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface EquipmentAssignTechnicianRepository extends JpaRepository<Equipment_Assign_Technician,String> {
 
     List<Equipment_Assign_Technician> findByEquipmentSchedulingId(String equipmentSchedulingId);
+
+    List<Equipment_Assign_Technician> findByTechnicianId(String technicianId);
 }
