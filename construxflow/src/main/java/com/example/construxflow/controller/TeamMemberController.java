@@ -58,4 +58,28 @@ public class TeamMemberController {
                     .body("Error retrieving team member: " + e.getMessage());
         }
     }
+
+    @PutMapping("/updateStatus")
+    public ResponseEntity<?> updateTeamMemberStatus(
+            @RequestParam String empId,
+            @RequestParam String status) {
+        try {
+            TeamMemberResponseDTO updatedMember = teamMemberService.updateTeamMemberStatus(empId, status);
+            return ResponseEntity.ok(updatedMember);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Team member not found with empId: " + empId);
+            } else if (e.getMessage().contains("Invalid status")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Invalid status value: " + status);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Error updating team member status: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error: " + e.getMessage());
+        }
+    }
 }

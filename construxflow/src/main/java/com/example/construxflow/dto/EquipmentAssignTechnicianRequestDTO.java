@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EquipmentAssignTechnicianRequestDTO {
+    private String equipmentId;
     private String equipmentSchedulingId;
     private List<String> technicianIds;
     private String duration;
