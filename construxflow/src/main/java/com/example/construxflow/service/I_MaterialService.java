@@ -76,8 +76,17 @@ public class I_MaterialService {
 
     // Delete material
     @Transactional
-    public void deleteMaterial(Long id) {
-        materialRepository.deleteById(id);
+    public boolean deleteMaterial(Long id) {
+        if (!materialRepository.existsById(id)) {
+            throw new IllegalArgumentException("Material not found with id: " + id);
+        }
+
+        try {
+            materialRepository.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete material: " + e.getMessage());
+        }
     }
 
     // Get materials with low stock
@@ -85,5 +94,6 @@ public class I_MaterialService {
         // You might want to set a default reorder level or make it configurable
         return materialRepository.findByQuantityInStockLessThanEqual(10);
     }
+
 
 }

@@ -6,12 +6,14 @@ import com.example.construxflow.entity.I_Material;
 import com.example.construxflow.service.EquipmentService;
 import com.example.construxflow.service.I_MaterialService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -104,6 +106,57 @@ public class InventoryController {
             return newStock;
         } else {
             throw new IllegalArgumentException("Invalid action. Use 'add' or 'remove'.");
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Map<String, Object>> deleteInventoryItem(
+            @RequestParam String type,
+            @RequestParam Long id) {
+
+        try {
+            boolean isDeleted;
+            String itemName = "";
+
+            if ("equipment".equalsIgnoreCase(type)) {
+                // Get equipment details before deletion for response
+                Equipment equipment = equipmentService.getEquipmentById(id);
+                if (equipment != null) {
+                    itemName = equipment.getName();
+                }
+                isDeleted = equipmentService.deleteEquipment(id);
+            } else if ("material".equalsIgnoreCase(type)) {
+                // Get material details before deletion for response
+                Optional<I_Material> material = materialService.getMaterialById(id);
+                if (material.isPresent()) {
+                    itemName = material.get().getName();
+                }
+                isDeleted = materialService.deleteMaterial(id);
+            } else {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Invalid type. Use 'equipment' or 'material'."));
+            }
+
+            if (isDeleted) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("message", itemName.isEmpty() ?
+                        "Item deleted successfully" :
+                        "'" + itemName + "' deleted successfully");
+                response.put("type", type);
+                response.put("id", id);
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "Failed to delete item"));
+            }
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 }
