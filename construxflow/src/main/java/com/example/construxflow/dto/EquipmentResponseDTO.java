@@ -1,39 +1,24 @@
-package com.example.construxflow.entity;
+package com.example.construxflow.dto;
 
-import jakarta.persistence.*;
+import com.example.construxflow.entity.EquipmentStatus;
 import lombok.*;
 
-@Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Table(name = "equipment")
-public class Equipment {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class EquipmentResponseDTO {
     private Long id;
-
     private String type;
     private String name;
     private String category;
     private String brand;
     private String model;
     private String serialNumber;
-    private Integer quantity;
     private String condition;
     private String purchaseDate;
     private String purchaseSource;
     private Double purchaseCost;
     private String location;
-
-    @Enumerated(EnumType.STRING)
     private EquipmentStatus status;
-
     private String nextMaintenance;
     private String lastMaintenance;
     private String notes;
-
 }
