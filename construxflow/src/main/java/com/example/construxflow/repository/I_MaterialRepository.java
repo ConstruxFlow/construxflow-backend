@@ -27,4 +27,6 @@ public interface I_MaterialRepository extends JpaRepository<I_Material, Long>, J
 
     // Find materials with low stock (below reorder level)
     List<I_Material> findByQuantityInStockLessThanEqual(Integer reorderLevel);
+
+    boolean existsById(Long id);
 }
