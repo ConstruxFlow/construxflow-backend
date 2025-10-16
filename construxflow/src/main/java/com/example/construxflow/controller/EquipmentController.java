@@ -10,10 +10,13 @@ import com.example.construxflow.entity.EquipmentStatus;
 import com.example.construxflow.service.EquipmentService;
 import com.example.construxflow.service.NextEquipmentScheduleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:3000/")
@@ -91,7 +94,7 @@ public class EquipmentController {
     /**
      * Paginated + searchable + filterable list for your table/cards,
      * but returns DTOs (UI-friendly) instead of entities.
-     *
+     * <p>
      * Example:
      * GET /api/equipment/search?search=excavator&status=In%20Use&page=0&size=10&sortBy=name&sortDir=asc
      * status can be: "All" | "Available" | "Under Maintenance" | "In Use"
@@ -128,5 +131,27 @@ public class EquipmentController {
     public ResponseEntity<List<Equipment>> searchEquipmentByName(@RequestParam String name) {
         List<Equipment> equipment = equipmentService.searchEquipmentByName(name);
         return ResponseEntity.ok(equipment);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteEquipment(@PathVariable Long id) {
+        try {
+            boolean isDeleted = equipmentService.deleteEquipment(id);
+            if (isDeleted) {
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "Equipment deleted successfully");
+                response.put("deletedId", id.toString());
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "Failed to delete equipment"));
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 }
