@@ -150,8 +150,17 @@ public class EquipmentService {
     }
 
     @Transactional
-    public void deleteEquipment(Long id) {
-        equipmentRepository.deleteById(id);
+    public boolean deleteEquipment(Long id) {
+        if (!equipmentRepository.existsById(id)) {
+            throw new IllegalArgumentException("Equipment not found with id: " + id);
+        }
+
+        try {
+            equipmentRepository.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete equipment: " + e.getMessage());
+        }
     }
 
     // ---------- search + pagination (kept as you wrote; returns entities) ----------
