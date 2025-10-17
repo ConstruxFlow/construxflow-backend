@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,11 +21,11 @@ public class Quotation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quotation_request_id", referencedColumnName = "id")
     private Quotation_request quotationRequest;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id", referencedColumnName = "supplier_id")
     private Supplier supplier;
 
@@ -33,18 +34,19 @@ public class Quotation {
     private LocalDateTime createdAt;
 
     private BigDecimal advancedPayment;
+
     private String paymentTerms;
     private String notes;
     private BigDecimal totalAmount;
     private String status;
 
-    @OneToMany(mappedBy = "quotation", cascade = CascadeType.ALL)
-    private List<QuotationItem> items;
 
-    @OneToMany(mappedBy = "quotation", cascade = CascadeType.ALL)
-    private List<QuotationDeliveryInfo> deliveryInfos;
+    @OneToMany(mappedBy = "quotation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<QuotationItem> items = new ArrayList<>();
 
-    @OneToMany(mappedBy = "quotation", cascade = CascadeType.ALL)
-    private List<QuotationAttachment> attachments;
+    @OneToMany(mappedBy = "quotation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<QuotationDeliveryInfo> deliveryInfos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "quotation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<QuotationAttachment> attachments = new ArrayList<>();
 }
