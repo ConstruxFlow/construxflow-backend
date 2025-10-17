@@ -13,6 +13,7 @@ import com.example.construxflow.dto.EquipmentSchedulingResponseDTO;
 import com.example.construxflow.dto.RequestMaintenanceMaterialsRequestDTO;
 import com.example.construxflow.dto.RequestMaintenanceMaterialsResponseDTO;
 import com.example.construxflow.repository.EquipmentSchedulingRepository;
+import com.example.construxflow.repository.I_MaterialRepository;
 import com.example.construxflow.repository.RequestMaintenanceMaterialsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import com.example.construxflow.dto.*;
+import com.example.construxflow.entity.I_Material;
 
 @Service
 @Transactional
@@ -37,6 +40,152 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
 
     @Autowired
     private RequestMaintenanceMaterialsRepository requestMaintenanceMaterialsRepository;
+
+    @Autowired
+    private I_MaterialRepository iMaterialRepository;
+
+    public MaintenanceRequestActionResponseDTO updateMaintenanceRequestStatus(
+            MaintenanceRequestStatusUpdateDTO statusUpdateDTO) {
+        try {
+            // 1. Find the equipment scheduling
+            Equipment_scheduling equipment = equipmentSchedulingRepository.findById(statusUpdateDTO.getEquipmentId())
+                    .orElseThrow(() -> new RuntimeException("Equipment scheduling not found"));
+
+            // 2. Update equipment status
+            String oldStatus = equipment.getStatus();
+            equipment.setStatus(statusUpdateDTO.getStatus());
+            equipmentSchedulingRepository.save(equipment);
+
+            // 3. Find all material requests for this equipment
+            List<Request_manintenance_materials> materialRequests =
+                    requestMaintenanceMaterialsRepository.findByEquipmentId(statusUpdateDTO.getEquipmentId());
+
+            int inventoryUpdatedCount = 0;
+
+            // 4. If approved, update inventory and material request statuses
+            if ("APPROVED".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
+                inventoryUpdatedCount = updateInventoryForApprovedRequest(materialRequests, statusUpdateDTO);
+            }
+
+            // 5. Update material request statuses
+            for (Request_manintenance_materials materialRequest : materialRequests) {
+                materialRequest.setStatus(statusUpdateDTO.getStatus());
+                if ("APPROVED".equalsIgnoreCase(statusUpdateDTO.getStatus()) && inventoryUpdatedCount > 0) {
+                    materialRequest.setInventoryUpdated(true);
+                    materialRequest.setInventoryUpdateNotes("Inventory updated upon approval");
+                }
+                requestMaintenanceMaterialsRepository.save(materialRequest);
+            }
+
+            return MaintenanceRequestActionResponseDTO.builder()
+                    .success(true)
+                    .message("Maintenance request " + statusUpdateDTO.getStatus().toLowerCase() + " successfully")
+                    .updatedStatus(statusUpdateDTO.getStatus())
+                    .inventoryItemsUpdated(inventoryUpdatedCount)
+                    .build();
+
+        } catch (Exception e) {
+            return MaintenanceRequestActionResponseDTO.builder()
+                    .success(false)
+                    .message("Failed to update status: " + e.getMessage())
+                    .updatedStatus(null)
+                    .inventoryItemsUpdated(0)
+                    .build();
+        }
+    }
+
+    private int updateInventoryForApprovedRequest(
+            List<Request_manintenance_materials> materialRequests,
+            MaintenanceRequestStatusUpdateDTO statusUpdateDTO) {
+
+        int updatedCount = 0;
+
+        for (Request_manintenance_materials materialRequest : materialRequests) {
+            try {
+                // Find the material in inventory by name
+                Optional<I_Material> inventoryMaterialOpt =
+                        iMaterialRepository.findByName(materialRequest.getItemName());
+
+                if (inventoryMaterialOpt.isPresent()) {
+                    I_Material inventoryMaterial = inventoryMaterialOpt.get();
+
+                    // Check if sufficient stock is available
+                    if (inventoryMaterial.getQuantityInStock() >= materialRequest.getQuantity()) {
+                        // Deduct the quantity from inventory
+                        int newQuantity = inventoryMaterial.getQuantityInStock() -
+                                materialRequest.getQuantity().intValue();
+                        inventoryMaterial.setQuantityInStock(newQuantity);
+
+                        iMaterialRepository.save(inventoryMaterial);
+                        updatedCount++;
+
+                        System.out.println("✅ Inventory updated for: " + materialRequest.getItemName() +
+                                " | Deducted: " + materialRequest.getQuantity() +
+                                " | Remaining: " + newQuantity);
+                    } else {
+                        System.out.println("❌ Insufficient stock for: " + materialRequest.getItemName() +
+                                " | Requested: " + materialRequest.getQuantity() +
+                                " | Available: " + inventoryMaterial.getQuantityInStock());
+                    }
+                } else {
+                    System.out.println("❌ Material not found in inventory: " + materialRequest.getItemName());
+                }
+            } catch (Exception e) {
+                System.err.println("❌ Error updating inventory for " + materialRequest.getItemName() +
+                        ": " + e.getMessage());
+            }
+        }
+
+        return updatedCount;
+    }
+
+    // Add method to get available materials for inventory check
+    public Map<String, Object> checkInventoryAvailability(String equipmentId) {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> materialAvailability = new ArrayList<>();
+
+        try {
+            List<Request_manintenance_materials> materialRequests =
+                    requestMaintenanceMaterialsRepository.findByEquipmentId(equipmentId);
+
+            boolean allAvailable = true;
+
+            for (Request_manintenance_materials materialRequest : materialRequests) {
+                Map<String, Object> materialInfo = new HashMap<>();
+                materialInfo.put("materialName", materialRequest.getItemName());
+                materialInfo.put("requestedQuantity", materialRequest.getQuantity());
+
+                Optional<I_Material> inventoryMaterial =
+                        iMaterialRepository.findByName(materialRequest.getItemName());
+
+                if (inventoryMaterial.isPresent()) {
+                    I_Material material = inventoryMaterial.get();
+                    materialInfo.put("availableQuantity", material.getQuantityInStock());
+                    materialInfo.put("isAvailable", material.getQuantityInStock() >= materialRequest.getQuantity());
+
+                    if (material.getQuantityInStock() < materialRequest.getQuantity()) {
+                        allAvailable = false;
+                    }
+                } else {
+                    materialInfo.put("availableQuantity", 0);
+                    materialInfo.put("isAvailable", false);
+                    allAvailable = false;
+                }
+
+                materialAvailability.add(materialInfo);
+            }
+
+            result.put("materialAvailability", materialAvailability);
+            result.put("allMaterialsAvailable", allAvailable);
+            result.put("success", true);
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "Error checking inventory: " + e.getMessage());
+        }
+
+        return result;
+    }
 
     public ScheduleMaintenanceAndRequestMaterialsResponseDTO createScheduleAndRequestMaterials(
             ScheduleMaintenanceAndRequestMaterialsDTO dto) {
