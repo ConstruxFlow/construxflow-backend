@@ -1,5 +1,6 @@
 package com.example.construxflow.service;
 
+import com.example.construxflow.entity.Order_payment;
 import com.example.construxflow.entity.PurchasingOrder;
 import com.example.construxflow.dto.PurchasingOrderResponseDTO;
 import com.example.construxflow.repository.PurchasingOrderRepository;
@@ -10,7 +11,10 @@ import org.springframework.data.domain.PageRequest;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.time.LocalDateTime;
 
@@ -174,6 +178,47 @@ public class PurchasingOrderService {
         }
     }
 
+    // Update only statuses payment and order
+    public PurchasingOrderResponseDTO updateStatusesOnly(Long id, String orderStatus, String paymentStatus) {
+        Optional<PurchasingOrder> purchasingOrderOpt = purchasingOrderRepository.findById(id);
+
+        if (purchasingOrderOpt.isPresent()) {
+            PurchasingOrder purchasingOrder = purchasingOrderOpt.get();
+            boolean isUpdated = false;
+
+            if (orderStatus != null && !orderStatus.trim().isEmpty()) {
+                purchasingOrder.setStatus(orderStatus.trim());
+                isUpdated = true;
+            }
+
+            // Update payment status ONLY if payment record exists
+            if (paymentStatus != null && !paymentStatus.trim().isEmpty()) {
+                Order_payment payment = purchasingOrder.getOrder_payment();
+
+                if (payment != null) {
+                    payment.setStatus(paymentStatus.trim());
+                    isUpdated = true;
+                } else {
+                    throw new RuntimeException("Payment record not found for this purchasing order");
+                }
+            }
+
+            if (!isUpdated) {
+                throw new RuntimeException("No valid status updates provided");
+            }
+
+            PurchasingOrder updatedPurchasingOrder = purchasingOrderRepository.save(purchasingOrder);
+
+            // Force loading of lazy collections
+            forceLoadCollections(updatedPurchasingOrder);
+
+            return purchasingOrderMapper.toResponseDTO(updatedPurchasingOrder);
+        } else {
+            throw new RuntimeException("Purchasing Order not found with ID: " + id);
+        }
+    }
+
+
     // Delete purchasing order
     public void deletePurchasingOrder(Long id) {
         if (purchasingOrderRepository.existsById(id)) {
@@ -248,6 +293,98 @@ public class PurchasingOrderService {
             throw new RuntimeException("Purchasing Order not found with ID: " + id);
         }
     }
+
+    // Update payment details (for full payment completion)
+    public PurchasingOrderResponseDTO updatePaymentDetails(Long id, Map<String, Object> paymentData) {
+        Optional<PurchasingOrder> purchasingOrderOpt = purchasingOrderRepository.findById(id);
+
+        if (purchasingOrderOpt.isPresent()) {
+            PurchasingOrder purchasingOrder = purchasingOrderOpt.get();
+            Order_payment payment = purchasingOrder.getOrder_payment();
+
+            if (payment == null) {
+                throw new RuntimeException("Payment record not found for this purchasing order");
+            }
+
+            boolean isUpdated = false;
+
+            // Update payment type
+            if (paymentData.containsKey("paymentType") && paymentData.get("paymentType") != null) {
+                payment.setPayment_type((String) paymentData.get("paymentType"));
+                isUpdated = true;
+            }
+
+            // Update bank details
+            if (paymentData.containsKey("bankDetails") && paymentData.get("bankDetails") != null) {
+                payment.setBank_details((String) paymentData.get("bankDetails"));
+                isUpdated = true;
+            }
+
+            // Update reference number
+            if (paymentData.containsKey("referenceNumber") && paymentData.get("referenceNumber") != null) {
+                payment.setReference_number((String) paymentData.get("referenceNumber"));
+                isUpdated = true;
+            }
+
+            // Update paid amount
+            if (paymentData.containsKey("paidAmount") && paymentData.get("paidAmount") != null) {
+                BigDecimal paidAmount;
+                Object paidAmountObj = paymentData.get("paidAmount");
+
+                if (paidAmountObj instanceof Number) {
+                    paidAmount = BigDecimal.valueOf(((Number) paidAmountObj).doubleValue());
+                } else if (paidAmountObj instanceof String) {
+                    paidAmount = new BigDecimal((String) paidAmountObj);
+                } else {
+                    throw new RuntimeException("Invalid paidAmount format");
+                }
+
+                payment.setPaid_amount(paidAmount);
+                isUpdated = true;
+            }
+
+            // Update remaining amount
+            if (paymentData.containsKey("remainingAmount") && paymentData.get("remainingAmount") != null) {
+                BigDecimal remainingAmount;
+                Object remainingAmountObj = paymentData.get("remainingAmount");
+
+                if (remainingAmountObj instanceof Number) {
+                    remainingAmount = BigDecimal.valueOf(((Number) remainingAmountObj).doubleValue());
+                } else if (remainingAmountObj instanceof String) {
+                    remainingAmount = new BigDecimal((String) remainingAmountObj);
+                } else {
+                    throw new RuntimeException("Invalid remainingAmount format");
+                }
+
+                payment.setRemaining_amount(remainingAmount);
+                isUpdated = true;
+            }
+
+            // Update notes
+            if (paymentData.containsKey("notes") && paymentData.get("notes") != null) {
+                payment.setNotes((String) paymentData.get("notes"));
+                isUpdated = true;
+            }
+
+            if (!isUpdated) {
+                throw new RuntimeException("No valid payment data provided for update");
+            }
+
+            // Update the updated date
+            payment.setUpdatedDate(LocalDateTime.now());
+
+            // Save the purchasing order (cascades to payment)
+            PurchasingOrder updatedPurchasingOrder = purchasingOrderRepository.save(purchasingOrder);
+
+            // Force loading of lazy collections
+            forceLoadCollections(updatedPurchasingOrder);
+
+            return purchasingOrderMapper.toResponseDTO(updatedPurchasingOrder);
+        } else {
+            throw new RuntimeException("Purchasing Order not found with ID: " + id);
+        }
+    }
+
 
     // Helper method to force loading of lazy collections
     private void forceLoadCollections(PurchasingOrder purchasingOrder) {

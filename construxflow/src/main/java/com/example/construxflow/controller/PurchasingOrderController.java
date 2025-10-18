@@ -149,6 +149,24 @@ public class PurchasingOrderController {
         }
     }
 
+    // Update payment details (for full payment completion)
+    @PatchMapping("/{id}/payment")
+    public ResponseEntity<ApiResponse<?>> updatePaymentDetails(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> paymentData) {
+        try {
+            PurchasingOrderResponseDTO response = purchasingOrderService.updatePaymentDetails(id, paymentData);
+            return ResponseEntity.ok(ApiResponse.success("Payment details updated successfully", response));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Purchasing Order not found", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to update payment details", e.getMessage()));
+        }
+    }
+
+
     // Delete purchasing order
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<String>> deletePurchasingOrder(@PathVariable Long id) {
@@ -181,4 +199,34 @@ public class PurchasingOrderController {
                     .body(ApiResponse.error("Failed to update purchasing order", e.getMessage()));
         }
     }
+
+    // Update both purchasing order status and payment status
+    @PatchMapping("/{id}/update-status")
+    public ResponseEntity<ApiResponse<?>> updateStatuses(
+            @PathVariable Long id,
+            @RequestParam(required = false) String orderStatus,
+            @RequestParam(required = false) String paymentStatus) {
+        try {
+            // Validate that at least one parameter is provided
+            if ((orderStatus == null || orderStatus.trim().isEmpty()) &&
+                    (paymentStatus == null || paymentStatus.trim().isEmpty())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(ApiResponse.error("At least one status is required",
+                                "Provide either orderStatus or paymentStatus parameter"));
+            }
+
+            PurchasingOrderResponseDTO response = purchasingOrderService.updateStatusesOnly(id, orderStatus, paymentStatus);
+            return ResponseEntity.ok(ApiResponse.success("Statues updated successfully", response));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Purchasing Order not found", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to update statuses", e.getMessage()));
+        }
+    }
+
 }
+
+
+
