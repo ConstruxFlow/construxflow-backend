@@ -2,25 +2,14 @@ package com.example.construxflow.controller;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import com.example.construxflow.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.construxflow.dto.MaterialRequestListDTO;
-import com.example.construxflow.dto.PhaseMaterialResponseDTO;
-import com.example.construxflow.dto.PhaseRequestDTO;
-import com.example.construxflow.dto.ProjectRequestDTO;
-import com.example.construxflow.dto.ProjectResponseDTO;
 import com.example.construxflow.service.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -82,6 +71,42 @@ public class ProjectController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PatchMapping("/{projectId}/phases/{phaseId}/status")
+    public ResponseEntity<String> updatePhaseStatus(
+            @PathVariable String projectId,
+            @PathVariable Long phaseId,
+            @RequestBody PhaseStatusUpdateDTO statusUpdate
+    ) {
+        try {
+            boolean updated = projectService.updatePhaseStatus(projectId, phaseId, statusUpdate.getStatus());
+            if (updated) {
+                return ResponseEntity.ok("Phase status updated successfully");
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to update phase status: " + e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{projectId}/status")
+    public ResponseEntity<String> updateProjectStatus(
+            @PathVariable String projectId,
+            @RequestBody Map<String, String> statusUpdate
+    ) {
+        try {
+            boolean updated = projectService.updateProjectStatus(projectId, statusUpdate.get("status"));
+            if (updated) {
+                return ResponseEntity.ok("Project status updated successfully");
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to update project status: " + e.getMessage());
+        }
+    }
+
 
     @GetMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDTO> getProject(@PathVariable String projectId) {
