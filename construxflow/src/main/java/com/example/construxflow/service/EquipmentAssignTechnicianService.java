@@ -28,6 +28,7 @@ public class EquipmentAssignTechnicianService {
 
             Equipment_Assign_Technician technician = new Equipment_Assign_Technician();
             technician.setAssignId(assignId);
+            technician.setEquipmentId(requestDTO.getEquipmentId());
             technician.setEquipmentSchedulingId(requestDTO.getEquipmentSchedulingId());
             technician.setTechnicianId(technicianId);
             technician.setDuration(requestDTO.getDuration());
@@ -42,6 +43,7 @@ public class EquipmentAssignTechnicianService {
 
             EquipmentAssignTechnicianResponseDTO response = new EquipmentAssignTechnicianResponseDTO(
                     saved.getAssignId(),
+                    saved.getEquipmentId(),
                     saved.getEquipmentSchedulingId(),
                     saved.getTechnicianId(),
                     saved.getDuration(),
@@ -89,9 +91,17 @@ public class EquipmentAssignTechnicianService {
         return mapToResponseDTO(assignTechnician);
     }
 
+    public List<EquipmentAssignTechnicianResponseDTO> getAssignmentsByTechnicianId(String technicianId) {
+        List<Equipment_Assign_Technician> assignments = equipmentAssignTechnicianRepository.findByTechnicianId(technicianId);
+        return assignments.stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     public EquipmentAssignTechnicianResponseDTO mapToResponseDTO(Equipment_Assign_Technician equipmentAssignTechnician) {
         return EquipmentAssignTechnicianResponseDTO.builder()
                 .assignId(equipmentAssignTechnician.getAssignId())
+                .equipmentId(equipmentAssignTechnician.getEquipmentId())
                 .equipmentSchedulingId(equipmentAssignTechnician.getEquipmentSchedulingId())
                 .technicianId(equipmentAssignTechnician.getTechnicianId())
                 .duration(equipmentAssignTechnician.getDuration())

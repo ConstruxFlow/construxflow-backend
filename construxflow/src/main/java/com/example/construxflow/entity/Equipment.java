@@ -22,12 +22,18 @@ public class Equipment {
     private String brand;
     private String model;
     private String serialNumber;
+    private Integer quantity;
     private String condition;
     private String purchaseDate;
     private String purchaseSource;
     private Double purchaseCost;
     private String location;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private EquipmentStatus status;
+
     private String nextMaintenance;
+    private String lastMaintenance;
     private String notes;
+
 }
