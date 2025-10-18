@@ -50,7 +50,7 @@ public class UserController {
         } catch (Exception e) {
 //            Flogger.error("Registration failed", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Registration failed: " + e.getMessage());
+                    .body("Registration failedfdbf: " + e.getMessage());
         }
     }
 
