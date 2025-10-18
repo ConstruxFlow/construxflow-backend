@@ -27,4 +27,11 @@ public class Request_manintenance_materials {
     private String measurement;
     private String justification;
     private String urgency;
+
+    // ✅ ADD THIS: Status for individual material requests
+    private String status = "PENDING"; // PENDING, APPROVED, REJECTED, FULFILLED
+
+    // ✅ Add inventory update tracking
+    private Boolean inventoryUpdated = false;
+    private String inventoryUpdateNotes;
 }

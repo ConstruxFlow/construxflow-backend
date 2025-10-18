@@ -42,4 +42,12 @@ public class NextEquipmentScheduleController {
         return ResponseEntity.ok(schedules);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<NextEquipmentScheduleResponseDTO>> getAllNextSchedule(){
+        List<NextEquipmentScheduleResponseDTO> schedules = nextEquipmentScheduleService.getAllNextScheduleDetails();
+        if (schedules.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(schedules);
+    }
 }
