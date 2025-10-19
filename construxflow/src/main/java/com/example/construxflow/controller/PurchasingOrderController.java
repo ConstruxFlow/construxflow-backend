@@ -90,6 +90,18 @@ public class PurchasingOrderController {
         }
     }
 
+    // Get delivered materials for a specific project
+    @GetMapping("/project/{projectId}/delivered-materials")
+    public ResponseEntity<ApiResponse<?>> getDeliveredMaterialsByProject(@PathVariable String projectId) {
+        try {
+            List<com.example.construxflow.dto.PurchasingOrderMaterialDTO> materials = purchasingOrderService.getDeliveredMaterialsByProject(projectId);
+            return ResponseEntity.ok(ApiResponse.success("Delivered materials retrieved successfully", materials));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to retrieve delivered materials", e.getMessage()));
+        }
+    }
+
     // Get purchasing orders by status
     @GetMapping("/status/{status}")
     public ResponseEntity<ApiResponse<?>> getPurchasingOrdersByStatus(@PathVariable String status) {
