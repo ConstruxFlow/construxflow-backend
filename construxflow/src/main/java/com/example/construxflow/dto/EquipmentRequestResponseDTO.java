@@ -1,17 +1,20 @@
 package com.example.construxflow.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class EquipmentRequestDTO {
+public class EquipmentRequestResponseDTO {
 
     private Long id;
-
     private String projectId;              // Project requesting equipment
     private String siteManagerId;          // Site Manager making the request
     private LocalDateTime requestDate;     // When request was made
@@ -26,4 +29,7 @@ public class EquipmentRequestDTO {
     private List<Long> equipmentIds;       // List of requested equipment IDs
     private String requestPurpose;         // Purpose of equipment usage
     private String expectedLocation;       // Where equipment will be used on site
+
+    // Enhanced field to include actual equipment details
+    private List<EquipmentDTO> equipmentDetails; // Complete equipment information for each requested equipment
 }
