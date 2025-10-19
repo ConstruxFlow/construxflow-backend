@@ -2,6 +2,7 @@ package com.example.construxflow.service;
 
 
 import com.example.construxflow.dto.SupplierDetailsDTO;
+import com.example.construxflow.dto.SupplierPerformanceUpdateDTO;
 import com.example.construxflow.dto.SupplierRegReqDTO;
 import com.example.construxflow.dto.SupplierRegResDTO;
 import com.example.construxflow.entity.Supplier;
@@ -20,5 +21,6 @@ public interface SupplierService {
 
     Supplier updateSupplier(String supplierId, Supplier updatedSupplier) throws Exception;
 
+    Supplier updateSupplierPerformance(String supplierId, SupplierPerformanceUpdateDTO performanceUpdate) throws Exception;
 
 }
