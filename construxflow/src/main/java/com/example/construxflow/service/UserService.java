@@ -15,8 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -267,6 +269,35 @@ public class UserService {
         </html>
         """.formatted(email, password, verificationLink, verificationLink);
     }
+
+    public List<UserResponseDetailsDTO> getUsersExceptSuppliersWithManagers() {
+        // List of manager entity classes matching roles
+        List<Class<?>> allowedManagerTypes = List.of(
+                Site_manager.class,
+                Inventory_manager.class,
+                Finance_officer.class,
+                Maintenance_head.class,
+                Purchasing_manager.class
+        );
+
+        List<UserDetails> users = userRepository.findUsersWithAllowedManagersExceptSuppliers(allowedManagerTypes);
+
+        return users.stream()
+                .map(user -> UserResponseDetailsDTO.builder()
+                        .userId(user.getUser_id())
+                        .firebaseUid(user.getFirebaseUid())
+                        .userName(user.getUser_name())
+                        .email(user.getEmail())
+                        .phoneNumber1(user.getPhone_number1())
+                        .phoneNumber2(user.getPhone_number2())
+                        .address(user.getAddress())
+                        .userRole(user.getUserRole())
+                        .managerId(user.getManager() != null ? user.getManager().getManager_id() : null)
+                        .supplierId(null) // suppliers excluded
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 
 
 }

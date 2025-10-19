@@ -1,14 +1,13 @@
 package com.example.construxflow.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "equipment_schedule")
+@Table(name = "maintenance_schedule_request")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class EquipmentSchedule {
+public class MaintenanceScheduleRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,25 +16,22 @@ public class EquipmentSchedule {
     @JoinColumn(name = "equipment_id", nullable = false)
     private Equipment equipment;
 
-    private String siteName;
+    private String equipmentName;
+    private String equipmentType;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate startDate;
-
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate endDate;
+    private LocalDateTime requestedAt;
 
     @Enumerated(EnumType.STRING)
-    private ScheduleStatus status;
+    private MaintenanceRequestStatus status;
 
-    @Column(length = 2000)
+    private String reason;
     private String notes;
-
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate createdAt;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDate.now();
+        requestedAt = LocalDateTime.now();
+        if (status == null) {
+            status = MaintenanceRequestStatus.PENDING;
+        }
     }
 }

@@ -6,7 +6,10 @@ import com.example.construxflow.dto.EquipmentStatsDTO;
 import com.example.construxflow.dto.PagedResponse;
 import com.example.construxflow.dto.NextEquipmentScheduleResponseDTO;
 import com.example.construxflow.entity.Equipment;
+import com.example.construxflow.entity.EquipmentSchedule;
 import com.example.construxflow.entity.EquipmentStatus;
+import com.example.construxflow.entity.ScheduleStatus;
+import com.example.construxflow.service.EquipmentScheduleService;
 import com.example.construxflow.service.EquipmentService;
 import com.example.construxflow.service.NextEquipmentScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +31,7 @@ public class EquipmentController {
 
     private final EquipmentService equipmentService;
     private final NextEquipmentScheduleService nextEquipmentScheduleService;
+    private final EquipmentScheduleService equipmentScheduleService;
 
     // --------------------- EXISTING ENDPOINTS (unchanged) ---------------------
 
@@ -154,4 +159,26 @@ public class EquipmentController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-}
+    @GetMapping("/{id}/schedule-status")
+    public ResponseEntity<Map<String, Object>> getEquipmentScheduleStatus(@PathVariable Long id) {
+        try {
+            Equipment equipment = equipmentService.getEquipmentById(id);
+            if (equipment == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            List<EquipmentSchedule> schedules = equipmentScheduleService.getSchedulesByEquipmentId(id);
+            boolean hasActiveSchedule = schedules.stream()
+                    .anyMatch(schedule -> schedule.getStatus() == ScheduleStatus.SCHEDULED &&
+                            schedule.getEndDate().isAfter(LocalDate.now()));
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("equipment", equipment);
+            response.put("hasActiveSchedule", hasActiveSchedule);
+            response.put("schedules", schedules);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }}

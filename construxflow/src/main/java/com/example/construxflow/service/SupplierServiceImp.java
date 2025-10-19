@@ -1,6 +1,7 @@
 package com.example.construxflow.service;
 
 import com.example.construxflow.dto.SupplierDetailsDTO;
+import com.example.construxflow.dto.SupplierPerformanceUpdateDTO;
 import com.example.construxflow.dto.SupplierRegReqDTO;
 import com.example.construxflow.dto.SupplierRegResDTO;
 import com.example.construxflow.entity.Supplier;
@@ -98,6 +99,7 @@ public class SupplierServiceImp implements SupplierService{
                 .past_orders_completed(supplier.getPast_orders_completed())
                 .avg_delay_days(supplier.getAvg_delay_days())
                 .rating_by_site_manager(supplier.getRating_by_site_manager())
+                .number_of_existing_ratings(supplier.getNumber_of_existing_ratings())
                 .build();
     }
 
@@ -135,6 +137,44 @@ public class SupplierServiceImp implements SupplierService{
 
         return supplierRepository.save(existingSupplier);
     }
+
+    @Override
+    public Supplier updateSupplierPerformance(String supplierId, SupplierPerformanceUpdateDTO performanceUpdate) throws Exception {
+        Optional<Supplier> optionalSupplier = supplierRepository.findById(supplierId);
+        if (!optionalSupplier.isPresent()) {
+            throw new Exception("Supplier not found with ID: " + supplierId);
+        }
+
+        Supplier existingSupplier = optionalSupplier.get();
+
+        // Update only performance-related fields
+        if (performanceUpdate.getOn_time_delivery_rate() != null) {
+            existingSupplier.setOn_time_delivery_rate(performanceUpdate.getOn_time_delivery_rate());
+        }
+
+        if (performanceUpdate.getQuotation_acceptance_rate() != null) {
+            existingSupplier.setQuotation_acceptance_rate(performanceUpdate.getQuotation_acceptance_rate());
+        }
+
+        if (performanceUpdate.getPast_orders_completed() != null) {
+            existingSupplier.setPast_orders_completed(performanceUpdate.getPast_orders_completed());
+        }
+
+        if (performanceUpdate.getAvg_delay_days() != null) {
+            existingSupplier.setAvg_delay_days(performanceUpdate.getAvg_delay_days());
+        }
+
+        if (performanceUpdate.getRating_by_site_manager() != null) {
+            existingSupplier.setRating_by_site_manager(performanceUpdate.getRating_by_site_manager());
+        }
+
+        if (performanceUpdate.getNumber_of_existing_ratings() != null) {
+            existingSupplier.setNumber_of_existing_ratings(performanceUpdate.getNumber_of_existing_ratings());
+        }
+
+        return supplierRepository.save(existingSupplier);
+    }
+
 
 
 }
