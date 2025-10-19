@@ -36,4 +36,8 @@ public class Equipment {
     private String lastMaintenance;
     private String notes;
 
+    private Double hoursUsed;
+    private Double kilometersTraveled;
+    private String fuelConsumption;
 }
+

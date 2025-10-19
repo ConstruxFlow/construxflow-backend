@@ -116,6 +116,13 @@ public class EquipmentService {
         return equipmentRepository.findById(id).orElse(null);
     }
 
+    public List<Equipment> getEquipmentByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return equipmentRepository.findAllById(ids);
+    }
+
     @Transactional
     public Equipment updateEquipment(Long id, EquipmentDTO dto) {
         Equipment existing = equipmentRepository.findById(id)
