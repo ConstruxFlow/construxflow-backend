@@ -8,11 +8,10 @@ import com.example.construxflow.mappers.PurchasingOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -27,7 +26,6 @@ public class PurchasingOrderService {
 
 
     public PurchasingOrderResponseDTO findLatestPurchasingOrder() {
-//        Pageable pageable = PageRequest.of(0, 1); // Get only the first (latest) result
         List<PurchasingOrder> purchasingOrders = purchasingOrderRepository.findAllOrderByOrderDateDesc();
         if (!purchasingOrders.isEmpty()) {
             PurchasingOrder latestOrder = purchasingOrders.get(0);
@@ -120,6 +118,8 @@ public class PurchasingOrderService {
                 .toList();
     }
 
+
+    
     // Find purchasing orders by status
     public List<PurchasingOrderResponseDTO> findPurchasingOrdersByStatus(String status) {
         List<PurchasingOrder> purchasingOrders = purchasingOrderRepository.findByStatus(status);
@@ -392,7 +392,6 @@ public class PurchasingOrderService {
             throw new RuntimeException("Purchasing Order not found with ID: " + id);
         }
     }
-
 
     // Helper method to force loading of lazy collections
     private void forceLoadCollections(PurchasingOrder purchasingOrder) {
