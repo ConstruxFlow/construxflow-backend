@@ -23,6 +23,7 @@ public class PurchasingOrder {
 
     private String ponumber;
     private Date order_date;
+    private Date required_date;
     private String status;
     private String additional_info;
     private BigDecimal subTotal;
