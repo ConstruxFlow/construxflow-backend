@@ -17,10 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -113,6 +110,18 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Could not send verification email.");
         }
     }
+
+    @GetMapping("/all-users")
+    public ResponseEntity<?> getAllUsersExceptSuppliersWithManagers() {
+        try {
+            List<UserResponseDetailsDTO> users = userService.getUsersExceptSuppliersWithManagers();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to retrieve users: " + e.getMessage());
+        }
+    }
+
 
 
 }
