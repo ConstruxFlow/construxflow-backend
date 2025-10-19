@@ -35,6 +35,9 @@ public interface PurchasingOrderRepository extends JpaRepository<PurchasingOrder
     @Query("SELECT po FROM PurchasingOrder po ORDER BY po.createdDate DESC LIMIT 1")
     List<PurchasingOrder> findAllOrderByOrderDateDesc();
 
+    @Query("SELECT po FROM PurchasingOrder po JOIN FETCH po.materials pom JOIN FETCH pom.material WHERE po.projectId = :projectId AND LOWER(po.status) = 'delivered'")
+    List<PurchasingOrder> findDeliveredByProjectId(@Param("projectId") String projectId);
+
 
 
 }
