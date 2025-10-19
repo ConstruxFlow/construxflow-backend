@@ -25,8 +25,6 @@ public interface PurchasingOrderRepository extends JpaRepository<PurchasingOrder
 
     Optional<PurchasingOrder> findByPonumber(String ponumber);
 
-    List<PurchasingOrder> findByProjectId(String projectId);
-
     List<PurchasingOrder> findByStatus(String status);
 
     @Query("SELECT po FROM PurchasingOrder po WHERE po.supplier.supplier_id = :supplierId")
