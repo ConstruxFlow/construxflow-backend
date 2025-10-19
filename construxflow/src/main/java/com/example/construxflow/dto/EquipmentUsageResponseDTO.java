@@ -1,15 +1,18 @@
 package com.example.construxflow.dto;
 
-import lombok.*;
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class EquipmentUsageUpdateDTO {
-
+public class EquipmentUsageResponseDTO {
     private Long id;
 
     private Long equipmentId;              // Equipment being logged
@@ -29,12 +32,4 @@ public class EquipmentUsageUpdateDTO {
     private String status;                 // Completed, Paused, Cancelled
     private LocalDateTime loggedAt;        // When this log was created
     private String loggedBy;               // Who created this log entry
-
 }
-
-
-
-
-
-
-

@@ -47,3 +47,5 @@ public class EquipmentDTO {
     private Double todayHours;
     private Double todayKilometers;
 }
+
+
