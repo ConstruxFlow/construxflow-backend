@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +21,10 @@ public interface UserRepository extends JpaRepository<UserDetails, Long> {
                   "ORDER BY u.createdAt DESC " +
                   "LIMIT 1")
     Optional<String> findLatestSupplierId(@Param("userRole") User_Role userRole);
+
+    @Query("SELECT u FROM UserDetails u " +
+            "LEFT JOIN FETCH u.manager m " +
+            "WHERE u.supplier IS NULL " +
+            "AND TYPE(m) IN :allowedManagerTypes")
+    List<UserDetails> findUsersWithAllowedManagersExceptSuppliers(@Param("allowedManagerTypes") List<Class<?>> allowedManagerTypes);
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.example.construxflow.api_response.ApiResponse;
 import com.example.construxflow.dto.SupplierDetailsDTO;
+import com.example.construxflow.dto.SupplierPerformanceUpdateDTO;
 import com.example.construxflow.dto.SupplierRegReqDTO;
 import com.example.construxflow.dto.SupplierRegResDTO;
 import com.example.construxflow.entity.Supplier;
@@ -107,6 +108,24 @@ public class SupplierController {
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
+
+    @PatchMapping("/update-performance/{id}")
+    public ResponseEntity<ApiResponse> updateSupplierPerformance(
+            @PathVariable("id") String id,
+            @RequestBody SupplierPerformanceUpdateDTO performanceUpdate) {
+        try {
+            Supplier updatedSupplier = supplierService.updateSupplierPerformance(id, performanceUpdate);
+            ApiResponse response = ApiResponse.success("Supplier performance metrics updated successfully", updatedSupplier);
+            return ResponseEntity.ok(response);
+        } catch (NotFoundException e) {
+            ApiResponse errorResponse = ApiResponse.error("Supplier not found: " + e.getMessage());
+            return ResponseEntity.status(404).body(errorResponse);
+        } catch (Exception e) {
+            ApiResponse errorResponse = ApiResponse.error("Error updating supplier performance: " + e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
 
 
 }

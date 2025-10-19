@@ -16,6 +16,7 @@ public class PurchasingOrderResponseDTO {
     private Long poId;
     private String ponumber;
     private Date orderDate;
+    private Date required_date;
     private String status;
     private String additionalInfo;
     private BigDecimal subTotal;
