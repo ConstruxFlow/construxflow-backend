@@ -2,6 +2,14 @@ package com.example.construxflow.controller;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
+import com.example.construxflow.dto.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -82,6 +90,42 @@ public class ProjectController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PatchMapping("/{projectId}/phases/{phaseId}/status")
+    public ResponseEntity<String> updatePhaseStatus(
+            @PathVariable String projectId,
+            @PathVariable Long phaseId,
+            @RequestBody PhaseStatusUpdateDTO statusUpdate
+    ) {
+        try {
+            boolean updated = projectService.updatePhaseStatus(projectId, phaseId, statusUpdate.getStatus());
+            if (updated) {
+                return ResponseEntity.ok("Phase status updated successfully");
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to update phase status: " + e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{projectId}/status")
+    public ResponseEntity<String> updateProjectStatus(
+            @PathVariable String projectId,
+            @RequestBody Map<String, String> statusUpdate
+    ) {
+        try {
+            boolean updated = projectService.updateProjectStatus(projectId, statusUpdate.get("status"));
+            if (updated) {
+                return ResponseEntity.ok("Project status updated successfully");
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to update project status: " + e.getMessage());
+        }
+    }
+
 
     @GetMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDTO> getProject(@PathVariable String projectId) {

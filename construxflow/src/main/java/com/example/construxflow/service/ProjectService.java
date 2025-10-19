@@ -93,6 +93,7 @@ public class ProjectService {
                 phase.setStatus(phaseDTO.getStatus());
                 phase.setProject(project);
                 phase.setSubtotal(phaseDTO.getSubtotal());
+                phase.setStatus("Pending");
 
                 phase = projectPhaseRepository.save(phase);
 
@@ -192,6 +193,58 @@ public class ProjectService {
         project = projectRepository.save(project);
         return convertToResponseDTO(project);
     }
+
+    public boolean updatePhaseStatus(String projectId, Long phaseId, String status) {
+        try {
+            // Validate that the phase belongs to the project
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new RuntimeException("Project not found"));
+
+            // Validate status values
+            if (!isValidStatus(status)) {
+                throw new IllegalArgumentException("Invalid status: " + status);
+            }
+
+            // Update only the status field
+            int updatedRows = projectPhaseRepository.updatePhaseStatus(phaseId, status);
+
+            // Log the update for debugging
+            System.out.println("Updated " + updatedRows + " phase(s) with status: " + status);
+
+            return updatedRows > 0;
+        } catch (Exception e) {
+            System.err.println("Error updating phase status: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    private boolean isValidStatus(String status) {
+        return status != null && (
+                status.equalsIgnoreCase("Pending") ||
+                        status.equalsIgnoreCase("In Progress") ||
+                        status.equalsIgnoreCase("Complete") ||
+                        status.equalsIgnoreCase("Completed") ||
+                        status.equalsIgnoreCase("On Hold") ||
+                        status.equalsIgnoreCase("Cancelled")
+        );
+    }
+
+    // Add this method to your ProjectService
+    public boolean updateProjectStatus(String projectId, String status) {
+        try {
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new RuntimeException("Project not found"));
+
+            project.setProgressStatus(status);
+            projectRepository.save(project);
+
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error updating project status: " + e.getMessage());
+            throw e;
+        }
+    }
+
 
     private Materials getOrCreateMaterial(PhaseMaterialRequestDTO materialDTO) {
         Materials material;
