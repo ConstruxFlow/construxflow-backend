@@ -83,6 +83,11 @@ public class PurchasingOrderMapper {
         return dto;
     }
 
+    // Public wrapper so services can map individual purchasing order material entities
+    public PurchasingOrderMaterialDTO mapPurchasingOrderMaterial(PurchasingOrder_materials entity) {
+        return toPurchasingOrderMaterialDTO(entity);
+    }
+
     private PurchasingOrderDeliveryDTO toPurchasingOrderDeliveryDTO(PurchasingOrder_Delivery entity) {
         PurchasingOrderDeliveryDTO dto = new PurchasingOrderDeliveryDTO();
         dto.setId(entity.getId());
