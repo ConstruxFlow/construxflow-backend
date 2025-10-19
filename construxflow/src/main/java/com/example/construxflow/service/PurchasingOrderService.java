@@ -6,16 +6,12 @@ import com.example.construxflow.dto.PurchasingOrderResponseDTO;
 import com.example.construxflow.repository.PurchasingOrderRepository;
 import com.example.construxflow.mappers.PurchasingOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -30,7 +26,6 @@ public class PurchasingOrderService {
 
 
     public PurchasingOrderResponseDTO findLatestPurchasingOrder() {
-//        Pageable pageable = PageRequest.of(0, 1); // Get only the first (latest) result
         List<PurchasingOrder> purchasingOrders = purchasingOrderRepository.findAllOrderByOrderDateDesc();
         if (!purchasingOrders.isEmpty()) {
             PurchasingOrder latestOrder = purchasingOrders.get(0);
@@ -123,6 +118,8 @@ public class PurchasingOrderService {
                 .toList();
     }
 
+
+    
     // Find purchasing orders by status
     public List<PurchasingOrderResponseDTO> findPurchasingOrdersByStatus(String status) {
         List<PurchasingOrder> purchasingOrders = purchasingOrderRepository.findByStatus(status);
@@ -144,6 +141,17 @@ public class PurchasingOrderService {
                     forceLoadCollections(purchasingOrder);
                     return purchasingOrderMapper.toResponseDTO(purchasingOrder);
                 })
+                .toList();
+    }
+
+    // Get all materials from delivered purchasing orders for a given project
+    public List<com.example.construxflow.dto.PurchasingOrderMaterialDTO> getDeliveredMaterialsByProject(String projectId) {
+        List<PurchasingOrder> deliveredOrders = purchasingOrderRepository.findDeliveredByProjectId(projectId);
+
+        // Collect all PurchasingOrder_materials from these orders
+        return deliveredOrders.stream()
+                .flatMap(po -> po.getMaterials() == null ? java.util.stream.Stream.empty() : po.getMaterials().stream())
+                .map(pom -> purchasingOrderMapper.mapPurchasingOrderMaterial(pom))
                 .toList();
     }
 
@@ -384,7 +392,6 @@ public class PurchasingOrderService {
             throw new RuntimeException("Purchasing Order not found with ID: " + id);
         }
     }
-
 
     // Helper method to force loading of lazy collections
     private void forceLoadCollections(PurchasingOrder purchasingOrder) {
