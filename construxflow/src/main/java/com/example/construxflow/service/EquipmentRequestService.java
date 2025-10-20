@@ -1,4 +1,3 @@
-
 package com.example.construxflow.service;
 
 import com.example.construxflow.dto.*;
@@ -9,10 +8,12 @@ import com.example.construxflow.repository.EquipmentRepository;
 import com.example.construxflow.repository.EquipmentRequestRepository;
 import com.example.construxflow.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ public class EquipmentRequestService {
     private final EquipmentRequestRepository requestRepository;
     private final ProjectRepository projectRepository;
     private final EquipmentRepository equipmentRepository;
+    private final EquipmentService equipmentService;
 
     // Get all equipment requests with detailed information
     @Transactional(readOnly = true)
@@ -49,7 +51,7 @@ public class EquipmentRequestService {
 
         // Convert equipment IDs to comma-separated string for storage
         String equipmentIds = requestDTO.getEquipmentIds().stream()
-                .map(String::valueOf)
+                .map(id -> String.valueOf(id)) // Fixed ambiguous method reference
                 .collect(Collectors.joining(","));
 
         EquipmentRequest request = EquipmentRequest.builder()
@@ -156,9 +158,9 @@ public class EquipmentRequestService {
 
         // Get equipment details
         if (request.getEquipmentIds() != null && !request.getEquipmentIds().isEmpty()) {
-            List<Long> equipmentIds = List.of(request.getEquipmentIds().split(","))
-                    .stream()
-                    .map(Long::valueOf)
+            List<Long> equipmentIds = Arrays.stream(request.getEquipmentIds().split(","))
+                    .map(String::trim)
+                    .map(id -> Long.valueOf(id)) // Fixed ambiguous method reference
                     .collect(Collectors.toList());
 
             List<Equipment> equipmentList = equipmentRepository.findByIdIn(equipmentIds);
@@ -173,24 +175,26 @@ public class EquipmentRequestService {
     }
 
     private EquipmentDTO convertToEquipmentDTO(Equipment equipment) {
-        EquipmentDTO dto = new EquipmentDTO();
-        dto.setId(equipment.getId());
-        dto.setName(equipment.getName());
-        dto.setType(equipment.getType());
-        dto.setCategory(equipment.getCategory());
-        dto.setBrand(equipment.getBrand());
-        dto.setModel(equipment.getModel());
-        dto.setCondition(equipment.getCondition());
-        dto.setQuantity(equipment.getQuantity());
-        return dto;
+        return EquipmentDTO.builder()
+                .id(equipment.getId())
+                .type(equipment.getType())
+                .name(equipment.getName())
+                .category(equipment.getCategory())
+                .brand(equipment.getBrand())
+                .model(equipment.getModel())
+                .serialNumber(equipment.getSerialNumber())
+                .quantity(equipment.getQuantity())
+                .condition(equipment.getCondition())
+                .purchaseDate(equipment.getPurchaseDate())
+                .purchaseSource(equipment.getPurchaseSource())
+                .purchaseCost(equipment.getPurchaseCost())
+                .location(equipment.getLocation())
+                .status(equipment.getStatus())
+                .nextMaintenance(equipment.getNextMaintenance())
+                .lastMaintenance(equipment.getLastMaintenance())
+                .notes(equipment.getNotes())
+                .build();
     }
-}
-
-    @Autowired
-    private EquipmentRequestRepository equipmentRequestRepository;
-
-    @Autowired
-    private EquipmentService equipmentService;
 
     public EquipmentRequestResponseDTO createEquipmentRequest(EquipmentRequestDTO requestDTO) {
         EquipmentRequest equipmentRequest = new EquipmentRequest();
@@ -199,12 +203,12 @@ public class EquipmentRequestService {
         equipmentRequest.setProjectId(requestDTO.getProjectId());
         equipmentRequest.setSiteManagerId(requestDTO.getSiteManagerId());
         equipmentRequest.setRequestDate(requestDTO.getRequestDate() != null ?
-            requestDTO.getRequestDate() : LocalDateTime.now());
+                requestDTO.getRequestDate() : LocalDateTime.now());
         equipmentRequest.setRequestedStartDate(requestDTO.getRequestedStartDate());
         equipmentRequest.setRequestedEndDate(requestDTO.getRequestedEndDate());
         equipmentRequest.setPriority(requestDTO.getPriority());
         equipmentRequest.setStatus(requestDTO.getStatus() != null ?
-            requestDTO.getStatus() : "Pending");
+                requestDTO.getStatus() : "Pending");
         equipmentRequest.setAdditionalNotes(requestDTO.getAdditionalNotes());
         equipmentRequest.setRejectionReason(requestDTO.getRejectionReason());
         equipmentRequest.setApprovalDate(requestDTO.getApprovalDate());
@@ -213,8 +217,8 @@ public class EquipmentRequestService {
         // Convert List<Long> to comma-separated String for entity
         if (requestDTO.getEquipmentIds() != null && !requestDTO.getEquipmentIds().isEmpty()) {
             String equipmentIdsString = requestDTO.getEquipmentIds().stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
+                    .map(id -> String.valueOf(id)) // Fixed ambiguous method reference
+                    .collect(Collectors.joining(","));
             equipmentRequest.setEquipmentIds(equipmentIdsString);
         }
 
@@ -222,15 +226,15 @@ public class EquipmentRequestService {
         equipmentRequest.setExpectedLocation(requestDTO.getExpectedLocation());
 
         // Save the entity
-        EquipmentRequest savedRequest = equipmentRequestRepository.save(equipmentRequest);
+        EquipmentRequest savedRequest = requestRepository.save(equipmentRequest);
 
         // Convert comma-separated String back to List<Long> for response
         List<Long> equipmentIdsList = null;
         if (savedRequest.getEquipmentIds() != null && !savedRequest.getEquipmentIds().isEmpty()) {
             equipmentIdsList = Arrays.stream(savedRequest.getEquipmentIds().split(","))
-                .map(String::trim)
-                .map(Long::valueOf)
-                .collect(Collectors.toList());
+                    .map(String::trim)
+                    .map(id -> Long.valueOf(id)) // Fixed ambiguous method reference
+                    .collect(Collectors.toList());
         }
 
         // Fetch equipment details
@@ -238,62 +242,62 @@ public class EquipmentRequestService {
 
         // Map saved entity to response DTO
         return EquipmentRequestResponseDTO.builder()
-            .id(savedRequest.getId())
-            .projectId(savedRequest.getProjectId())
-            .siteManagerId(savedRequest.getSiteManagerId())
-            .requestDate(savedRequest.getRequestDate())
-            .requestedStartDate(savedRequest.getRequestedStartDate())
-            .requestedEndDate(savedRequest.getRequestedEndDate())
-            .priority(savedRequest.getPriority())
-            .status(savedRequest.getStatus())
-            .additionalNotes(savedRequest.getAdditionalNotes())
-            .rejectionReason(savedRequest.getRejectionReason())
-            .approvalDate(savedRequest.getApprovalDate())
-            .approvedBy(savedRequest.getApprovedBy())
-            .equipmentIds(equipmentIdsList)
-            .requestPurpose(savedRequest.getRequestPurpose())
-            .expectedLocation(savedRequest.getExpectedLocation())
-            .equipmentDetails(equipmentDetails)
-            .build();
+                .id(savedRequest.getId())
+                .projectId(savedRequest.getProjectId())
+                .siteManagerId(savedRequest.getSiteManagerId())
+                .requestDate(savedRequest.getRequestDate())
+                .requestedStartDate(savedRequest.getRequestedStartDate())
+                .requestedEndDate(savedRequest.getRequestedEndDate())
+                .priority(savedRequest.getPriority())
+                .status(savedRequest.getStatus())
+                .additionalNotes(savedRequest.getAdditionalNotes())
+                .rejectionReason(savedRequest.getRejectionReason())
+                .approvalDate(savedRequest.getApprovalDate())
+                .approvedBy(savedRequest.getApprovedBy())
+                .equipmentIds(equipmentIdsList)
+                .requestPurpose(savedRequest.getRequestPurpose())
+                .expectedLocation(savedRequest.getExpectedLocation())
+                .equipmentDetails(equipmentDetails)
+                .build();
     }
 
-    public List<EquipmentRequestResponseDTO> getAllEquipmentRequests(){
-        List<EquipmentRequest> requests = equipmentRequestRepository.findAll();
+    public List<EquipmentRequestResponseDTO> getAllEquipmentRequests() {
+        List<EquipmentRequest> requests = requestRepository.findAll();
 
         return requests.stream()
-            .map(saved -> {
-                // Convert comma-separated String to List<Long> for equipmentIds
-                List<Long> equipmentIdsList = null;
-                if (saved.getEquipmentIds() != null && !saved.getEquipmentIds().isEmpty()) {
-                    equipmentIdsList = Arrays.stream(saved.getEquipmentIds().split(","))
-                        .map(String::trim)
-                        .map(Long::valueOf)
-                        .collect(Collectors.toList());
-                }
+                .map(saved -> {
+                    // Convert comma-separated String to List<Long> for equipmentIds
+                    List<Long> equipmentIdsList = null;
+                    if (saved.getEquipmentIds() != null && !saved.getEquipmentIds().isEmpty()) {
+                        equipmentIdsList = Arrays.stream(saved.getEquipmentIds().split(","))
+                                .map(String::trim)
+                                .map(id -> Long.valueOf(id)) // Fixed ambiguous method reference
+                                .collect(Collectors.toList());
+                    }
 
-                // Fetch equipment details for this request
-                List<EquipmentDTO> equipmentDetails = fetchEquipmentDetails(equipmentIdsList);
+                    // Fetch equipment details for this request
+                    List<EquipmentDTO> equipmentDetails = fetchEquipmentDetails(equipmentIdsList);
 
-                return EquipmentRequestResponseDTO.builder()
-                    .id(saved.getId())
-                    .projectId(saved.getProjectId())
-                    .siteManagerId(saved.getSiteManagerId())
-                    .requestDate(saved.getRequestDate())
-                    .requestedStartDate(saved.getRequestedStartDate())
-                    .requestedEndDate(saved.getRequestedEndDate())
-                    .priority(saved.getPriority())
-                    .status(saved.getStatus())
-                    .additionalNotes(saved.getAdditionalNotes())
-                    .rejectionReason(saved.getRejectionReason())
-                    .approvalDate(saved.getApprovalDate())
-                    .approvedBy(saved.getApprovedBy())
-                    .equipmentIds(equipmentIdsList)
-                    .requestPurpose(saved.getRequestPurpose())
-                    .expectedLocation(saved.getExpectedLocation())
-                    .equipmentDetails(equipmentDetails)
-                    .build();
-            })
-            .collect(Collectors.toList());
+                    return EquipmentRequestResponseDTO.builder()
+                            .id(saved.getId())
+                            .projectId(saved.getProjectId())
+                            .siteManagerId(saved.getSiteManagerId())
+                            .requestDate(saved.getRequestDate())
+                            .requestedStartDate(saved.getRequestedStartDate())
+                            .requestedEndDate(saved.getRequestedEndDate())
+                            .priority(saved.getPriority())
+                            .status(saved.getStatus())
+                            .additionalNotes(saved.getAdditionalNotes())
+                            .rejectionReason(saved.getRejectionReason())
+                            .approvalDate(saved.getApprovalDate())
+                            .approvedBy(saved.getApprovedBy())
+                            .equipmentIds(equipmentIdsList)
+                            .requestPurpose(saved.getRequestPurpose())
+                            .expectedLocation(saved.getExpectedLocation())
+                            .equipmentDetails(equipmentDetails)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     private List<EquipmentDTO> fetchEquipmentDetails(List<Long> equipmentIds) {
@@ -303,50 +307,28 @@ public class EquipmentRequestService {
 
         List<Equipment> equipmentList = equipmentService.getEquipmentByIds(equipmentIds);
         return equipmentList.stream()
-            .map(this::convertToEquipmentDTO)
-            .collect(Collectors.toList());
-    }
-
-    private EquipmentDTO convertToEquipmentDTO(Equipment equipment) {
-        return EquipmentDTO.builder()
-            .id(equipment.getId())
-            .type(equipment.getType())
-            .name(equipment.getName())
-            .category(equipment.getCategory())
-            .brand(equipment.getBrand())
-            .model(equipment.getModel())
-            .serialNumber(equipment.getSerialNumber())
-            .quantity(equipment.getQuantity())
-            .condition(equipment.getCondition())
-            .purchaseDate(equipment.getPurchaseDate())
-            .purchaseSource(equipment.getPurchaseSource())
-            .purchaseCost(equipment.getPurchaseCost())
-            .location(equipment.getLocation())
-            .status(equipment.getStatus())
-            .nextMaintenance(equipment.getNextMaintenance())
-            .lastMaintenance(equipment.getLastMaintenance())
-            .notes(equipment.getNotes())
-            .build();
+                .map(this::convertToEquipmentDTO)
+                .collect(Collectors.toList());
     }
 
     public EquipmentRequestResponseDTO updateEquipmentRequestStatus(Long requestId, String newStatus) {
         // Find the existing equipment request
-        EquipmentRequest existingRequest = equipmentRequestRepository.findById(requestId)
-            .orElseThrow(() -> new RuntimeException("Equipment request not found with id: " + requestId));
+        EquipmentRequest existingRequest = requestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Equipment request not found with id: " + requestId));
 
         // Update only the status
         existingRequest.setStatus(newStatus);
 
         // Save the updated request
-        EquipmentRequest updatedRequest = equipmentRequestRepository.save(existingRequest);
+        EquipmentRequest updatedRequest = requestRepository.save(existingRequest);
 
         // Convert comma-separated String back to List<Long> for response
         List<Long> equipmentIdsList = null;
         if (updatedRequest.getEquipmentIds() != null && !updatedRequest.getEquipmentIds().isEmpty()) {
             equipmentIdsList = Arrays.stream(updatedRequest.getEquipmentIds().split(","))
-                .map(String::trim)
-                .map(Long::valueOf)
-                .collect(Collectors.toList());
+                    .map(String::trim)
+                    .map(id -> Long.valueOf(id)) // Fixed ambiguous method reference
+                    .collect(Collectors.toList());
         }
 
         // Fetch equipment details
@@ -354,21 +336,22 @@ public class EquipmentRequestService {
 
         // Return updated response DTO
         return EquipmentRequestResponseDTO.builder()
-            .id(updatedRequest.getId())
-            .projectId(updatedRequest.getProjectId())
-            .siteManagerId(updatedRequest.getSiteManagerId())
-            .requestDate(updatedRequest.getRequestDate())
-            .requestedStartDate(updatedRequest.getRequestedStartDate())
-            .requestedEndDate(updatedRequest.getRequestedEndDate())
-            .priority(updatedRequest.getPriority())
-            .status(updatedRequest.getStatus())
-            .additionalNotes(updatedRequest.getAdditionalNotes())
-            .rejectionReason(updatedRequest.getRejectionReason())
-            .approvalDate(updatedRequest.getApprovalDate())
-            .approvedBy(updatedRequest.getApprovedBy())
-            .equipmentIds(equipmentIdsList)
-            .requestPurpose(updatedRequest.getRequestPurpose())
-            .expectedLocation(updatedRequest.getExpectedLocation())
-            .equipmentDetails(equipmentDetails)
-            .build();
+                .id(updatedRequest.getId())
+                .projectId(updatedRequest.getProjectId())
+                .siteManagerId(updatedRequest.getSiteManagerId())
+                .requestDate(updatedRequest.getRequestDate())
+                .requestedStartDate(updatedRequest.getRequestedStartDate())
+                .requestedEndDate(updatedRequest.getRequestedEndDate())
+                .priority(updatedRequest.getPriority())
+                .status(updatedRequest.getStatus())
+                .additionalNotes(updatedRequest.getAdditionalNotes())
+                .rejectionReason(updatedRequest.getRejectionReason())
+                .approvalDate(updatedRequest.getApprovalDate())
+                .approvedBy(updatedRequest.getApprovedBy())
+                .equipmentIds(equipmentIdsList)
+                .requestPurpose(updatedRequest.getRequestPurpose())
+                .expectedLocation(updatedRequest.getExpectedLocation())
+                .equipmentDetails(equipmentDetails)
+                .build();
     }
+}
