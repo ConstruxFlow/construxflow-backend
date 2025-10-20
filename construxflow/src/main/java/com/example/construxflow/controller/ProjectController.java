@@ -151,8 +151,8 @@ public class ProjectController {
     public ResponseEntity<List<String>> debugProjects() {
         try {
             List<String> projectInfo = projectService.getAllProjects().stream()
-                .map(p -> "ID: " + p.getProjectId() + ", Name: " + p.getProjectName())
-                .collect(java.util.stream.Collectors.toList());
+                    .map(p -> "ID: " + p.getProjectId() + ", Name: " + p.getProjectName())
+                    .collect(java.util.stream.Collectors.toList());
             return ResponseEntity.ok(projectInfo);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -183,8 +183,8 @@ public class ProjectController {
 
     @GetMapping("/{projectId}/phases/{phaseName}/materials")
     public ResponseEntity<List<PhaseMaterialResponseDTO>> getPhaseMaterials(
-        @PathVariable String projectId,
-        @PathVariable String phaseName
+            @PathVariable String projectId,
+            @PathVariable String phaseName
     ) {
         try {
             System.out.println("Received request for projectId: " + projectId + ", phaseName: " + phaseName);

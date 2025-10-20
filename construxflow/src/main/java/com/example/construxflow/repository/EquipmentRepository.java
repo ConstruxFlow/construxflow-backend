@@ -23,4 +23,34 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Long>, Jpa
 
     // ✅ ADD THIS: Delete by ID (already exists in JpaRepository, but we can add custom if needed)
     // The deleteById method is already provided by JpaRepository
+
+    List<Equipment> findByIdIn(List<Long> ids);
+
+    // Find available equipment (not in maintenance and quantity > 0)
+    List<Equipment> findByStatusAndQuantityGreaterThan(EquipmentStatus status, Integer quantity);
+
+    // Find by category for filtering
+    List<Equipment> findByCategory(String category);
+
+    @Query("SELECT e.status as status, COUNT(e) as count FROM Equipment e GROUP BY e.status")
+    List<Object[]> countEquipmentByStatus();
+
+    List<Equipment> findTop5ByOrderByIdDesc();
+
+    // Additional useful queries
+    List<Equipment> findByStatus(EquipmentStatus status);
+
+    @Query("SELECT COUNT(e) FROM Equipment e WHERE e.status = 'AVAILABLE'")
+    Long countAvailableEquipment();
+
+    @Query("SELECT COUNT(e) FROM Equipment e WHERE e.status = 'IN_USE'")
+    Long countInUseEquipment();
+
+    @Query("SELECT COUNT(e) FROM Equipment e WHERE e.status = 'UNDER_MAINTENANCE'")
+
+    Long countUnderMaintenanceEquipment();
+
+    @Query("SELECT COUNT(e) FROM Equipment e")
+    Long countTotalEquipment();
+
 }

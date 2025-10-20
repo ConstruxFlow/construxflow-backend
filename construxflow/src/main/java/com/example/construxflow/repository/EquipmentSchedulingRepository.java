@@ -72,4 +72,13 @@ public interface EquipmentSchedulingRepository extends JpaRepository<Equipment_s
 
     // Find by equipment ID
     List<Equipment_scheduling> findByEquipmentId(Integer equipmentId);
+
+    Long countByStatus(String status);
+
+    @Query("SELECT COUNT(es) FROM Equipment_scheduling es WHERE es.status = 'PENDING'")
+    Long countPendingRequests();
+
+    @Query("SELECT COUNT(es) FROM Equipment_scheduling es WHERE es.status = 'ACCEPT'")
+    Long countApprovedRequests();
+
 }
