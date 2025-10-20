@@ -1,3 +1,4 @@
+
 package com.example.construxflow.repository;
 
 import com.example.construxflow.entity.InventoryRequest;
@@ -12,3 +13,4 @@ public interface InventoryRequestRepository extends JpaRepository<InventoryReque
     Long countByStatus(RequestStatus status);
     List<InventoryRequest> findTop5ByOrderByIdDesc();
 }
+

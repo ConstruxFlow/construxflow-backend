@@ -1,8 +1,19 @@
 package com.example.construxflow.controller;
 
+
 import com.example.construxflow.dto.*;
 import com.example.construxflow.entity.*;
 import com.example.construxflow.repository.EquipmentSchedulingRepository;
+import com.example.construxflow.dto.EquipmentDTO;
+import com.example.construxflow.dto.EquipmentListItemDTO;
+import com.example.construxflow.dto.EquipmentStatsDTO;
+import com.example.construxflow.dto.PagedResponse;
+import com.example.construxflow.dto.NextEquipmentScheduleResponseDTO;
+import com.example.construxflow.entity.Equipment;
+import com.example.construxflow.entity.EquipmentSchedule;
+import com.example.construxflow.entity.EquipmentStatus;
+import com.example.construxflow.entity.ScheduleStatus;
+
 import com.example.construxflow.service.EquipmentScheduleService;
 import com.example.construxflow.service.EquipmentService;
 import com.example.construxflow.service.NextEquipmentScheduleService;
@@ -12,11 +23,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,9 +43,9 @@ public class EquipmentController {
     private final NextEquipmentScheduleService nextEquipmentScheduleService;
     private final EquipmentScheduleService equipmentScheduleService;
 
+
     @Autowired
     private EquipmentSchedulingRepository equipmentSchedulingRepository;
-
     // --------------------- EXISTING ENDPOINTS (unchanged) ---------------------
 
     @PostMapping("/add")
@@ -181,6 +194,7 @@ public class EquipmentController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+
     }
     @GetMapping("/details/{equipmentId}")
     public ResponseEntity<?> getEquipmentDetails(@PathVariable String equipmentId) {
@@ -271,3 +285,4 @@ public class EquipmentController {
         }
     }
 }
+

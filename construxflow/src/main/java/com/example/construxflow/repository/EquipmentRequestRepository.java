@@ -31,4 +31,3 @@ public interface EquipmentRequestRepository extends JpaRepository<EquipmentReque
     List<EquipmentRequest> findOverlappingRequests(@Param("startDate") LocalDateTime startDate,
                                                    @Param("endDate") LocalDateTime endDate);
 }
-

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
@@ -20,12 +21,23 @@ import java.util.Map;
 import java.time.LocalDate;
 import java.util.List;
 
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
 @Service
 @RequiredArgsConstructor
 public class EquipmentScheduleService {
 
     private final EquipmentScheduleRepository scheduleRepository;
     private final EquipmentRepository equipmentRepository;
+
+    private final MaintenanceScheduleRequestService maintenanceRequestService; // Add this line
+
+
 
     public ScheduleFormDataDTO getScheduleFormData(Long equipmentId) {
         Equipment equipment = equipmentRepository.findById(equipmentId)
@@ -85,6 +97,7 @@ public class EquipmentScheduleService {
         return scheduleRepository.findByEquipmentId(equipmentId);
     }
 
+
     private boolean hasMaintenanceConflict(Long equipmentId, LocalDate startDate, LocalDate endDate) {
         Equipment equipment = equipmentRepository.findById(equipmentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipment not found"));
@@ -107,15 +120,20 @@ public class EquipmentScheduleService {
         }
     }
 
+
+    // Add this method to your existing EquipmentScheduleService
+
     public Map<String, Object> checkSchedulingConstraints(Long equipmentId, LocalDate startDate, LocalDate endDate) {
         Map<String, Object> constraints = new HashMap<>();
 
         // Check for scheduling conflicts
         boolean hasSchedulingConflict = scheduleRepository.hasSchedulingConflict(equipmentId, startDate, endDate);
         constraints.put("hasSchedulingConflict", hasSchedulingConflict);
+        
 
-        // Check for maintenance conflicts using the utility method
-        boolean hasMaintenanceConflict = hasMaintenanceConflict(equipmentId, startDate, endDate);
+        // Check for maintenance conflicts
+        boolean hasMaintenanceConflict = maintenanceRequestService.hasMaintenanceConflict(equipmentId, startDate, endDate);
+
         constraints.put("hasMaintenanceConflict", hasMaintenanceConflict);
 
         // Get equipment for additional info
@@ -123,9 +141,15 @@ public class EquipmentScheduleService {
         if (equipment != null) {
             constraints.put("nextMaintenance", equipment.getNextMaintenance());
             constraints.put("equipmentName", equipment.getName());
+
             constraints.put("currentStatus", equipment.getStatus().name());
+
+
         }
 
         return constraints;
     }
+
 }
+
+

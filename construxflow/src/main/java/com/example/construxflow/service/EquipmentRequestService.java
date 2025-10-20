@@ -1,5 +1,6 @@
 package com.example.construxflow.service;
 
+
 import com.example.construxflow.dto.*;
 import com.example.construxflow.entity.Equipment;
 import com.example.construxflow.entity.EquipmentRequest;
@@ -11,6 +12,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.example.construxflow.dto.EquipmentDTO;
+import com.example.construxflow.dto.EquipmentRequestDTO;
+import com.example.construxflow.dto.EquipmentRequestResponseDTO;
+import com.example.construxflow.entity.Equipment;
+import com.example.construxflow.entity.EquipmentRequest;
+import com.example.construxflow.repository.EquipmentRequestRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

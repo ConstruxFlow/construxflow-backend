@@ -52,4 +52,5 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Long>, Jpa
 
     @Query("SELECT COUNT(e) FROM Equipment e")
     Long countTotalEquipment();
+
 }

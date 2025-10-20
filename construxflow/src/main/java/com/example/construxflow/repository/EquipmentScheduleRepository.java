@@ -1,3 +1,4 @@
+
 package com.example.construxflow.repository;
 
 import com.example.construxflow.entity.EquipmentSchedule;
@@ -26,4 +27,5 @@ public interface EquipmentScheduleRepository extends JpaRepository<EquipmentSche
 
     @Query("SELECT es FROM EquipmentSchedule es WHERE es.startDate >= :today ORDER BY es.startDate ASC")
     List<EquipmentSchedule> findUpcomingSchedules(LocalDate today);
+
 }
