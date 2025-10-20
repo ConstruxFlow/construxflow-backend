@@ -57,6 +57,16 @@ public class MaintenanceScheduleRequestController {
         return ResponseEntity.ok(requests);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<MaintenanceScheduleRequest>> getAllMaintenanceRequests() {
+        try {
+            List<MaintenanceScheduleRequest> requests = maintenanceRequestService.getAllMaintenanceRequests();
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @PatchMapping("/{requestId}/status")
     public ResponseEntity<MaintenanceScheduleRequest> updateRequestStatus(
             @PathVariable Long requestId,

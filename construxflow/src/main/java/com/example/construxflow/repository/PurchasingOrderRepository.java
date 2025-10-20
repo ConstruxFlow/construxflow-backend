@@ -25,6 +25,8 @@ public interface PurchasingOrderRepository extends JpaRepository<PurchasingOrder
 
     Optional<PurchasingOrder> findByPonumber(String ponumber);
 
+    List<PurchasingOrder> findByProjectId(String projectId);
+
     List<PurchasingOrder> findByStatus(String status);
 
     @Query("SELECT po FROM PurchasingOrder po WHERE po.supplier.supplier_id = :supplierId")
@@ -32,6 +34,9 @@ public interface PurchasingOrderRepository extends JpaRepository<PurchasingOrder
 
     @Query("SELECT po FROM PurchasingOrder po ORDER BY po.createdDate DESC LIMIT 1")
     List<PurchasingOrder> findAllOrderByOrderDateDesc();
+
+    @Query("SELECT po FROM PurchasingOrder po JOIN FETCH po.materials pom JOIN FETCH pom.material WHERE po.projectId = :projectId AND LOWER(po.status) = 'delivered'")
+    List<PurchasingOrder> findDeliveredByProjectId(@Param("projectId") String projectId);
 
 
 

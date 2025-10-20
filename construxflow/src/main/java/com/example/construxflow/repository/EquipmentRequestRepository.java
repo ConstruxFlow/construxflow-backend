@@ -1,3 +1,4 @@
+
 package com.example.construxflow.repository;
 
 import com.example.construxflow.entity.EquipmentRequest;
@@ -30,3 +31,4 @@ public interface EquipmentRequestRepository extends JpaRepository<EquipmentReque
     List<EquipmentRequest> findOverlappingRequests(@Param("startDate") LocalDateTime startDate,
                                                    @Param("endDate") LocalDateTime endDate);
 }
+
