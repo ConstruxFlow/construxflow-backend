@@ -292,11 +292,29 @@ public class UserService {
                         .phoneNumber2(user.getPhone_number2())
                         .address(user.getAddress())
                         .userRole(user.getUserRole())
+                        .created_at(user.getCreatedAt())
                         .managerId(user.getManager() != null ? user.getManager().getManager_id() : null)
                         .supplierId(null) // suppliers excluded
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public Optional<UserResponseDetailsDTO> getUserByManagerId(String managerId) {
+        return userRepository.findByManagerId(managerId)
+                .map(user -> UserResponseDetailsDTO.builder()
+                        .userId(user.getUser_id())
+                        .firebaseUid(user.getFirebaseUid())
+                        .userName(user.getUser_name())
+                        .email(user.getEmail())
+                        .phoneNumber1(user.getPhone_number1())
+                        .phoneNumber2(user.getPhone_number2())
+                        .address(user.getAddress())
+                        .userRole(user.getUserRole())
+                        .managerId(user.getManager() != null ? user.getManager().getManager_id() : null)
+                        .supplierId(user.getSupplier() != null ? user.getSupplier().getSupplier_id() : null)
+                        .build());
+    }
+
 
 
 

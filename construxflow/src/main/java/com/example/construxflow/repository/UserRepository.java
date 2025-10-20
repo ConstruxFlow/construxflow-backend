@@ -15,6 +15,9 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserDetails, Long> {
     Optional<UserDetails> findByFirebaseUid(String firebaseUid);
 
+    @Query("SELECT u FROM UserDetails u WHERE u.manager.manager_id = :managerId")
+    Optional<UserDetails> findByManagerId(@Param("managerId") String managerId);
+
     @Query("SELECT u.supplier.supplier_id " +
                   "FROM UserDetails u " +
                   "WHERE u.userRole = :userRole " +

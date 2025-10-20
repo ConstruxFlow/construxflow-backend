@@ -1,5 +1,6 @@
 package com.example.construxflow.controller;
 
+import com.example.construxflow.dto.ErrorResponse;
 import com.example.construxflow.dto.UserRequestDetailsDTO;
 import com.example.construxflow.dto.UserResponseDetailsDTO;
 import com.example.construxflow.entity.UserDetails;
@@ -121,6 +122,24 @@ public class UserController {
                     .body("Failed to retrieve users: " + e.getMessage());
         }
     }
+
+    @GetMapping("/by-manager/{managerId}")
+    public ResponseEntity<Object> getUserByManager(@PathVariable String managerId) {
+        try {
+            return userService.getUserByManagerId(managerId)
+                    .<ResponseEntity<Object>>map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("User not found for manager ID: " + managerId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving user: " + e.getMessage());
+        }
+    }
+
+
+
+
+
 
 
 
