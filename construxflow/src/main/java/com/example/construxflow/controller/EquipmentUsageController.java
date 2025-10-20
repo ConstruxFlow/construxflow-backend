@@ -1,5 +1,6 @@
 package com.example.construxflow.controller;
 
+import com.example.construxflow.dto.EquipmentAverageUsageDTO;
 import com.example.construxflow.dto.EquipmentLastUsageDTO;
 import com.example.construxflow.dto.EquipmentUsageResponseDTO;
 import com.example.construxflow.dto.EquipmentUsageSummaryDTO;
@@ -70,6 +71,19 @@ public class EquipmentUsageController {
             return ResponseEntity.ok(lastUsage);
         } catch (Exception e) {
             System.err.println("Error fetching equipment last usage: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/average/{equipmentId}")
+    public ResponseEntity<EquipmentAverageUsageDTO> getEquipmentAverageUsage(@PathVariable Long equipmentId) {
+        try {
+            System.out.println("GET request received for equipment average usage, Equipment ID: " + equipmentId);
+            EquipmentAverageUsageDTO averageUsage = equipmentUsageService.getEquipmentAverageUsage(equipmentId);
+            return ResponseEntity.ok(averageUsage);
+        } catch (Exception e) {
+            System.err.println("Error fetching equipment average usage: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
