@@ -71,6 +71,10 @@ public class MaintenanceScheduleRequestService {
         return maintenanceRequestRepository.findByEquipmentId(equipmentId);
     }
 
+    public List<MaintenanceScheduleRequest> getAllMaintenanceRequests() {
+        return maintenanceRequestRepository.findAll();
+    }
+
     public MaintenanceScheduleRequest updateRequestStatus(Long requestId, MaintenanceRequestStatus status) {
         MaintenanceScheduleRequest request = maintenanceRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Maintenance request not found"));
