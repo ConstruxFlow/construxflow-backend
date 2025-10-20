@@ -20,4 +20,10 @@ public interface EquipmentScheduleRepository extends JpaRepository<EquipmentSche
     boolean hasSchedulingConflict(@Param("equipmentId") Long equipmentId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     List<EquipmentSchedule> findByEquipmentId(Long equipmentId);
+
+    List<EquipmentSchedule> findByStartDateBetween(LocalDate start, LocalDate end);
+    List<EquipmentSchedule> findByStatus(ScheduleStatus status);
+
+    @Query("SELECT es FROM EquipmentSchedule es WHERE es.startDate >= :today ORDER BY es.startDate ASC")
+    List<EquipmentSchedule> findUpcomingSchedules(LocalDate today);
 }
