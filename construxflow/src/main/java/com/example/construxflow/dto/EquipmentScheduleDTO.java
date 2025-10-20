@@ -2,6 +2,7 @@ package com.example.construxflow.dto;
 
 import lombok.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,4 +19,7 @@ public class EquipmentScheduleDTO {
     private String equipmentName;
     private String equipmentType;
     private String nextMaintenance;
+
+    private List<ScheduleItemDTO> scheduleItems;
+    private List<MaintenanceHistoryDTO> maintenanceHistory;
 }

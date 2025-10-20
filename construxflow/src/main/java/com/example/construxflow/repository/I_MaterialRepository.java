@@ -29,4 +29,10 @@ public interface I_MaterialRepository extends JpaRepository<I_Material, Long>, J
     List<I_Material> findByQuantityInStockLessThanEqual(Integer reorderLevel);
 
     boolean existsById(Long id);
+
+    @Query("SELECT COUNT(m) FROM I_Material m")
+    Long countTotalMaterials();
+
+    @Query("SELECT COUNT(m) FROM I_Material m WHERE m.quantityInStock <= m.reorderLevel")
+    Long countLowStockMaterials();
 }

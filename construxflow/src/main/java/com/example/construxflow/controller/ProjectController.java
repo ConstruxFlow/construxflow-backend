@@ -42,14 +42,14 @@ public class ProjectController {
 
     @PostMapping("/create")
     public ResponseEntity<ProjectResponseDTO> createProject(
-        @RequestParam("managerId")  String managerId,
-        @RequestParam("projectName") String projectName,
-        @RequestParam("location") String location,
-        @RequestParam("startDate") String startDate,
-        @RequestParam("endDate") String endDate,
-        @RequestParam("progressStatus") String progressStatus,
-        @RequestParam(value = "boqFile", required = false) MultipartFile boqFile,
-        @RequestParam("phases") String phasesJson
+            @RequestParam("managerId")  String managerId,
+            @RequestParam("projectName") String projectName,
+            @RequestParam("location") String location,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
+            @RequestParam("progressStatus") String progressStatus,
+            @RequestParam(value = "boqFile", required = false) MultipartFile boqFile,
+            @RequestParam("phases") String phasesJson
 
     ) {
         ObjectMapper mapper = new ObjectMapper();
@@ -68,15 +68,15 @@ public class ProjectController {
 
     @PutMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDTO> updateProject(
-        @PathVariable String projectId,
-        @RequestParam("managerId")  String managerId,
-        @RequestParam("projectName") String projectName,
-        @RequestParam("location") String location,
-        @RequestParam("startDate") String startDate,
-        @RequestParam("endDate") String endDate,
-        @RequestParam("progressStatus") String progressStatus,
-        @RequestParam(value = "boqFile", required = false) MultipartFile boqFile,
-        @RequestParam("phases") String phasesJson
+            @PathVariable String projectId,
+            @RequestParam("managerId")  String managerId,
+            @RequestParam("projectName") String projectName,
+            @RequestParam("location") String location,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
+            @RequestParam("progressStatus") String progressStatus,
+            @RequestParam(value = "boqFile", required = false) MultipartFile boqFile,
+            @RequestParam("phases") String phasesJson
     ) {
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -151,8 +151,8 @@ public class ProjectController {
     public ResponseEntity<List<String>> debugProjects() {
         try {
             List<String> projectInfo = projectService.getAllProjects().stream()
-                .map(p -> "ID: " + p.getProjectId() + ", Name: " + p.getProjectName())
-                .collect(java.util.stream.Collectors.toList());
+                    .map(p -> "ID: " + p.getProjectId() + ", Name: " + p.getProjectName())
+                    .collect(java.util.stream.Collectors.toList());
             return ResponseEntity.ok(projectInfo);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -183,8 +183,8 @@ public class ProjectController {
 
     @GetMapping("/{projectId}/phases/{phaseName}/materials")
     public ResponseEntity<List<PhaseMaterialResponseDTO>> getPhaseMaterials(
-        @PathVariable String projectId,
-        @PathVariable String phaseName
+            @PathVariable String projectId,
+            @PathVariable String phaseName
     ) {
         try {
             System.out.println("Received request for projectId: " + projectId + ", phaseName: " + phaseName);
