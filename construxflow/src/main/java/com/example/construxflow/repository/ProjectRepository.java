@@ -10,4 +10,5 @@ import java.util.List;
 public interface ProjectRepository extends JpaRepository<Project, String> {
     List<Project> findByProgressStatus(String status);
     List<Project> findByLocation(String location);
+    Project findByProjectId(String projectId);
 }
