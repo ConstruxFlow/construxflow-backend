@@ -1,5 +1,6 @@
 package com.example.construxflow.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "equipment")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Equipment {
 
     @Id
@@ -40,4 +42,3 @@ public class Equipment {
     private Double kilometersTraveled;
     private String fuelConsumption;
 }
-

@@ -1,5 +1,6 @@
 package com.example.construxflow.service;
 
+import com.example.construxflow.dto.EquipmentAverageUsageDTO;
 import com.example.construxflow.dto.EquipmentLastUsageDTO;
 import com.example.construxflow.dto.EquipmentUsageResponseDTO;
 import com.example.construxflow.dto.EquipmentUsageSummaryDTO;
@@ -211,6 +212,47 @@ public class EquipmentUsageService {
             .purpose(lastUsage.getPurpose())
             .status(lastUsage.getStatus())
             .hasUsageHistory(true)
+            .build();
+    }
+
+    public EquipmentAverageUsageDTO getEquipmentAverageUsage(Long equipmentId) {
+        System.out.println("Calculating average usage for equipment ID: " + equipmentId);
+
+        // Fetch all usage logs for the specific equipment
+        List<EquipmentUsageLog> equipmentLogs = equipmentUsageRepository.findByEquipmentId(equipmentId);
+
+        if (equipmentLogs.isEmpty()) {
+            return EquipmentAverageUsageDTO.builder()
+                .equipmentId(equipmentId)
+                .averageHoursUsed(0.0)
+                .averageKilometersTraveled(0.0)
+                .averageFuelConsumption(0.0)
+                .totalUsageRecords(0)
+                .build();
+        }
+
+        // Calculate averages
+        double totalHours = equipmentLogs.stream()
+            .mapToDouble(log -> log.getHoursUsed() != null ? log.getHoursUsed() : 0.0)
+            .sum();
+
+        double totalKilometers = equipmentLogs.stream()
+            .mapToDouble(log -> log.getKilometersTraveled() != null ? log.getKilometersTraveled() : 0.0)
+            .sum();
+
+        // For fuel consumption, parse numeric values from strings like "25.5L"
+        double totalFuelConsumption = equipmentLogs.stream()
+            .mapToDouble(log -> parseFuelConsumption(log.getFuelConsumption()))
+            .sum();
+
+        int recordCount = equipmentLogs.size();
+
+        return EquipmentAverageUsageDTO.builder()
+            .equipmentId(equipmentId)
+            .averageHoursUsed(totalHours / recordCount)
+            .averageKilometersTraveled(totalKilometers / recordCount)
+            .averageFuelConsumption(totalFuelConsumption / recordCount)
+            .totalUsageRecords(recordCount)
             .build();
     }
 }
