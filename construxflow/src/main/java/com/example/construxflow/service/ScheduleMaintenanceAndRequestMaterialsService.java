@@ -3,9 +3,7 @@ package com.example.construxflow.service;
 import com.example.construxflow.dto.MaintenanceRequestOverviewDTO;
 import com.example.construxflow.entity.Equipment_scheduling;
 import com.example.construxflow.dto.MaintenanceRequestDetailDTO;
-import com.example.construxflow.entity.Equipment_scheduling;
 import com.example.construxflow.entity.Request_manintenance_materials;
-
 import com.example.construxflow.dto.ScheduleMaintenanceAndRequestMaterialsDTO;
 import com.example.construxflow.dto.ScheduleMaintenanceAndRequestMaterialsResponseDTO;
 import com.example.construxflow.dto.EquipmentSchedulingRequestDTO;
@@ -34,7 +32,6 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
     @Autowired
     private RequestMaintenanceMaterialsService requestMaintenanceMaterialsService;
 
-    // Create combined equipment scheduling and material requests
     @Autowired
     private EquipmentSchedulingRepository equipmentSchedulingRepository;
 
@@ -44,6 +41,41 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
     @Autowired
     private I_MaterialRepository iMaterialRepository;
 
+    // Status mapping methods
+    private String mapStatusToDatabase(String frontendStatus) {
+        if (frontendStatus == null) return "PENDING";
+
+        switch (frontendStatus.toUpperCase()) {
+            case "APPROVED":
+                return "Accept"; // Map to database value
+            case "REJECTED":
+                return "REJECT"; // Map to database value
+            case "PENDING":
+                return "PENDING"; // Keep same
+            default:
+                return frontendStatus;
+        }
+    }
+
+    private String mapStatusToFrontend(String databaseStatus) {
+        if (databaseStatus == null) return "PENDING";
+
+        switch (databaseStatus.toUpperCase()) {
+            case "Accept":
+                return "APPROVED"; // Map to frontend display
+            case "REJECT":
+                return "REJECTED"; // Map to frontend display
+            case "PENDING":
+                return "PENDING"; // Keep same
+            case "APPROVED":
+                return "APPROVED"; // Already in frontend format
+            case "REJECTED":
+                return "REJECTED"; // Already in frontend format
+            default:
+                return databaseStatus;
+        }
+    }
+
     public MaintenanceRequestActionResponseDTO updateMaintenanceRequestStatus(
             MaintenanceRequestStatusUpdateDTO statusUpdateDTO) {
         try {
@@ -51,9 +83,10 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
             Equipment_scheduling equipment = equipmentSchedulingRepository.findById(statusUpdateDTO.getEquipmentId())
                     .orElseThrow(() -> new RuntimeException("Equipment scheduling not found"));
 
-            // 2. Update equipment status
+            // 2. Map frontend status to database status and update
+            String dbStatus = mapStatusToDatabase(statusUpdateDTO.getStatus());
             String oldStatus = equipment.getStatus();
-            equipment.setStatus(statusUpdateDTO.getStatus());
+            equipment.setStatus(dbStatus); // Save as "ACCEPT" or "REJECT" in database
             equipmentSchedulingRepository.save(equipment);
 
             // 3. Find all material requests for this equipment
@@ -67,9 +100,9 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
                 inventoryUpdatedCount = updateInventoryForApprovedRequest(materialRequests, statusUpdateDTO);
             }
 
-            // 5. Update material request statuses
+            // 5. Update material request statuses with database status
             for (Request_manintenance_materials materialRequest : materialRequests) {
-                materialRequest.setStatus(statusUpdateDTO.getStatus());
+                materialRequest.setStatus(dbStatus); // Save as "ACCEPT" or "REJECT" in database
                 if ("APPROVED".equalsIgnoreCase(statusUpdateDTO.getStatus()) && inventoryUpdatedCount > 0) {
                     materialRequest.setInventoryUpdated(true);
                     materialRequest.setInventoryUpdateNotes("Inventory updated upon approval");
@@ -80,7 +113,7 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
             return MaintenanceRequestActionResponseDTO.builder()
                     .success(true)
                     .message("Maintenance request " + statusUpdateDTO.getStatus().toLowerCase() + " successfully")
-                    .updatedStatus(statusUpdateDTO.getStatus())
+                    .updatedStatus(statusUpdateDTO.getStatus()) // Return "APPROVED" to frontend
                     .inventoryItemsUpdated(inventoryUpdatedCount)
                     .build();
 
@@ -139,7 +172,6 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
         return updatedCount;
     }
 
-    // Add method to get available materials for inventory check
     public Map<String, Object> checkInventoryAvailability(String equipmentId) {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> materialAvailability = new ArrayList<>();
@@ -207,7 +239,7 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
             equipmentDTO.setDate(dto.getScheduleDate());
             equipmentDTO.setTime(dto.getScheduleTime());
             equipmentDTO.setDescription(dto.getScheduleNotes());
-            equipmentDTO.setStatus("Pending");
+            equipmentDTO.setStatus("PENDING"); // Set initial status as PENDING
             equipmentDTO.setNewStatus("");
 
             System.out.println("Creating Equipment Scheduling...");
@@ -250,7 +282,7 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
                                     dto.getUrgencyLevel().toUpperCase() : "MEDIUM");
 
                             System.out.println("Attempting to save Material Request: " + materialRequestId);
-                            System.out.println(materialDTO.getMeasurement());
+                            System.out.println("Measurement: " + materialDTO.getMeasurement());
 
                             RequestMaintenanceMaterialsResponseDTO materialResponse =
                                     requestMaintenanceMaterialsService.createMaintenanceRequest(materialDTO);
@@ -362,9 +394,6 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
         }
     }
 
-
-
-    // Update combined data with user-provided IDs
     public ScheduleMaintenanceAndRequestMaterialsResponseDTO updateScheduleAndRequestMaterials(
             String equipmentId, ScheduleMaintenanceAndRequestMaterialsDTO dto) {
 
@@ -436,7 +465,6 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
         }
     }
 
-    // Other methods remain the same...
     public ScheduleMaintenanceAndRequestMaterialsResponseDTO getScheduleAndMaterialsByEquipmentId(String equipmentId) {
         try {
             Optional<EquipmentSchedulingResponseDTO> equipmentResponse =
@@ -485,10 +513,6 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
         }
     }
 
-
-
-
-
     // Check if equipment has pending material requests
     public boolean hasEquipmentPendingMaterialRequests(String equipmentId) {
         try {
@@ -529,14 +553,14 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
         return schedules.stream().map(schedule -> {
             MaintenanceRequestOverviewDTO dto = new MaintenanceRequestOverviewDTO();
             dto.setEquipment(schedule.getEquipmentName());
-            dto.setDate(schedule.getDate().toString()); // Or format here
-            dto.setRequestedBy("System Admin"); // Placeholder or fetch from user if available
-            dto.setStatus(schedule.getStatus());
+            dto.setDate(schedule.getDate().toString());
+            dto.setRequestedBy("System Admin");
+            // Map status for frontend display
+            dto.setStatus(mapStatusToFrontend(schedule.getStatus()));
             dto.setId(schedule.getId());
             return dto;
         }).collect(Collectors.toList());
     }
-
 
     public MaintenanceRequestDetailDTO getMaintenanceRequestDetails(String equipmentId) {
         Equipment_scheduling equipment = equipmentSchedulingRepository.findById(equipmentId)
@@ -548,23 +572,25 @@ public class ScheduleMaintenanceAndRequestMaterialsService {
         List<MaintenanceRequestDetailDTO.MaterialItem> materialItems = materials.stream().map(item -> {
             MaintenanceRequestDetailDTO.MaterialItem m = new MaintenanceRequestDetailDTO.MaterialItem();
             m.setName(item.getItemName());
-            m.setDesc("Auto-generated description for " + item.getItemName()); // Replace if actual desc exists
+            m.setDesc("Auto-generated description for " + item.getItemName());
             m.setQty(item.getQuantity().toString());
-            m.setStock("N/A"); // Update if stock tracking is added
+            m.setStock("N/A");
             m.setNotes(item.getJustification());
             return m;
         }).collect(Collectors.toList());
 
         MaintenanceRequestDetailDTO dto = new MaintenanceRequestDetailDTO();
         dto.setEquipmentName(equipment.getEquipmentName());
-        dto.setRequestedBy("System Admin"); // Replace if user data exists
+        dto.setRequestedBy("System Admin");
         dto.setSchedule(equipment.getDate() + " - " + equipment.getTime());
         dto.setPriority(equipment.getPriority() + " Priority");
         dto.setAvailability("Currently assigned to Site A - Available after 3 days");
         dto.setComments(equipment.getDescription());
         dto.setMaterials(materialItems);
 
+        // Map database status to frontend display status
+        dto.setStatus(mapStatusToFrontend(equipment.getStatus()));
+
         return dto;
     }
-
 }

@@ -1,14 +1,14 @@
 package com.example.construxflow.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MaintenanceRequestDetailDTO {
     private String equipmentName;
     private String requestedBy;
@@ -17,10 +17,13 @@ public class MaintenanceRequestDetailDTO {
     private String availability;
     private String comments;
     private List<MaterialItem> materials;
+    private String status; // Add this field
 
-    @Data
-    @AllArgsConstructor
+    @Getter
+    @Setter
     @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class MaterialItem {
         private String name;
         private String desc;

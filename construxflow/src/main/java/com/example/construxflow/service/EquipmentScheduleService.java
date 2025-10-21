@@ -129,7 +129,7 @@ public class EquipmentScheduleService {
         // Check for scheduling conflicts
         boolean hasSchedulingConflict = scheduleRepository.hasSchedulingConflict(equipmentId, startDate, endDate);
         constraints.put("hasSchedulingConflict", hasSchedulingConflict);
-        
+
 
         // Check for maintenance conflicts
         boolean hasMaintenanceConflict = maintenanceRequestService.hasMaintenanceConflict(equipmentId, startDate, endDate);
