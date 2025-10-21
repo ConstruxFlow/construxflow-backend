@@ -1,5 +1,9 @@
 package com.example.construxflow.controller;
 
+
+import com.example.construxflow.dto.*;
+import com.example.construxflow.entity.*;
+import com.example.construxflow.repository.EquipmentSchedulingRepository;
 import com.example.construxflow.dto.EquipmentDTO;
 import com.example.construxflow.dto.EquipmentListItemDTO;
 import com.example.construxflow.dto.EquipmentStatsDTO;
@@ -9,18 +13,24 @@ import com.example.construxflow.entity.Equipment;
 import com.example.construxflow.entity.EquipmentSchedule;
 import com.example.construxflow.entity.EquipmentStatus;
 import com.example.construxflow.entity.ScheduleStatus;
+
 import com.example.construxflow.service.EquipmentScheduleService;
 import com.example.construxflow.service.EquipmentService;
 import com.example.construxflow.service.NextEquipmentScheduleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:3000/")
@@ -33,6 +43,9 @@ public class EquipmentController {
     private final NextEquipmentScheduleService nextEquipmentScheduleService;
     private final EquipmentScheduleService equipmentScheduleService;
 
+
+    @Autowired
+    private EquipmentSchedulingRepository equipmentSchedulingRepository;
     // --------------------- EXISTING ENDPOINTS (unchanged) ---------------------
 
     @PostMapping("/add")
@@ -181,4 +194,95 @@ public class EquipmentController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
-    }}
+
+    }
+    @GetMapping("/details/{equipmentId}")
+    public ResponseEntity<?> getEquipmentDetails(@PathVariable String equipmentId) {
+        try {
+            // In a real application, you would have an Equipment entity
+            // For now, we'll use Equipment_scheduling to simulate equipment details
+            Optional<Equipment_scheduling> equipmentOpt = equipmentSchedulingRepository.findById(equipmentId);
+
+            if (equipmentOpt.isPresent()) {
+                Equipment_scheduling equipment = equipmentOpt.get();
+
+                EquipmentDetailsDTO details = EquipmentDetailsDTO.builder()
+                        .id(Long.parseLong(equipmentId.replaceAll("\\D+", ""))) // Extract numbers from ID
+                        .name(equipment.getEquipmentName())
+                        .type(equipment.getEquipmentType())
+                        .brand("Caterpillar") // Mock data
+                        .model("CAT-320") // Mock data
+                        .status(equipment.getStatus())
+                        .location("Site A - Construction Zone")
+                        .lastMaintenance("2024-01-15")
+                        .nextMaintenance("2024-04-15")
+                        .utilization("75%")
+                        .specifications("200 HP, 25 Ton Capacity")
+                        .notes("Regular maintenance required every 3 months")
+                        .build();
+
+                return ResponseEntity.ok(details);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error fetching equipment details: " + e.getMessage());
+        }
+    }
+    @GetMapping("/schedule/{equipmentId}")
+    public ResponseEntity<?> getEquipmentSchedule(@PathVariable String equipmentId) {
+        try {
+            // Find all schedules for this equipment
+            List<Equipment_scheduling> schedules = equipmentSchedulingRepository.findByEquipmentId(Integer.parseInt(equipmentId.replaceAll("\\D+", "")));
+
+            EquipmentScheduleDTO scheduleDTO = new EquipmentScheduleDTO();
+            scheduleDTO.setEquipmentId(Long.parseLong(equipmentId.replaceAll("\\D+", "")));
+            scheduleDTO.setEquipmentName(schedules.isEmpty() ? "Unknown Equipment" : schedules.get(0).getEquipmentName());
+
+            // Convert schedules to ScheduleItemDTO
+            List<ScheduleItemDTO> scheduleItems = schedules.stream().map(schedule ->
+                    ScheduleItemDTO.builder()
+                            .scheduleId(schedule.getId())
+                            .date(schedule.getDate())
+                            .time(schedule.getTime() != null ? schedule.getTime().toString() : "09:00")
+                            .maintenanceType(schedule.getMaintenanceType())
+                            .priority(schedule.getPriority())
+                            .status(schedule.getStatus())
+                            .assignedTo("Maintenance Team A")
+                            .description(schedule.getDescription())
+                            .build()
+            ).toList();
+
+            scheduleDTO.setScheduleItems(scheduleItems);
+
+            // Mock maintenance history
+            List<MaintenanceHistoryDTO> maintenanceHistory = List.of(
+                    MaintenanceHistoryDTO.builder()
+                            .maintenanceId("MNT-001")
+                            .date(new Date(System.currentTimeMillis() - 90L * 24 * 60 * 60 * 1000)) // 90 days ago
+                            .type("Routine Maintenance")
+                            .performedBy("John Smith")
+                            .description("Oil change, filter replacement, and general inspection")
+                            .status("Completed")
+                            .cost(1250.50)
+                            .build(),
+                    MaintenanceHistoryDTO.builder()
+                            .maintenanceId("MNT-002")
+                            .date(new Date(System.currentTimeMillis() - 180L * 24 * 60 * 60 * 1000)) // 180 days ago
+                            .type("Major Overhaul")
+                            .performedBy("Mike Johnson")
+                            .description("Engine rebuild and hydraulic system repair")
+                            .status("Completed")
+                            .cost(8500.75)
+                            .build()
+            );
+
+            scheduleDTO.setMaintenanceHistory(maintenanceHistory);
+
+            return ResponseEntity.ok(scheduleDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error fetching equipment schedule: " + e.getMessage());
+        }
+    }
+}
+
